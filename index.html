@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <!-- 公用组件库开始 -->
+  <link rel="stylesheet" href="//cdn.bootcss.com/weui/0.4.3/style/weui.min.css">
+  <link rel="stylesheet" href="//cdn.bootcss.com/jquery-weui/0.8.3/css/jquery-weui.min.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <script src="lib/jquery-3.3.1.js"></script>
+  <script src="//cdn.bootcss.com/jquery-weui/0.8.3/js/jquery-weui.min.js"></script>
+  <!-- 公用组件库结束 -->
+  <script src="js/index.js"></script>
+  <title>首页</title>
+</head>
+
+<body>
+  <div class="list" style="height:600px;">
+    <div class="weui-pull-to-refresh-layer">
+      <div class="pull-to-refresh-arrow"></div> <!-- 上下拉动的时候显示的箭头 -->
+      <div class="pull-to-refresh-preloader"></div> <!-- 正在刷新的菊花 -->
+      <div class="down">下拉刷新</div><!-- 下拉过程显示的文案 -->
+      <div class="up">释放刷新</div><!-- 下拉超过50px显示的文案 -->
+      <div class="refresh">正在刷新...</div><!-- 正在刷新时显示的文案 -->
+    </div>
+    <div class="list-content">
+      12314
+    </div>
+  </div>
+</body>
+<script>
+  $(".list").pullToRefresh().on("pull-to-refresh", function () {
+    setTimeout(function () {
+        // $(".list-content").html("");
+        $(".list").pullToRefreshDone(); // 重置下拉刷新
+    }, 1500);   //模拟延迟
+  });
+</script>
+</html>

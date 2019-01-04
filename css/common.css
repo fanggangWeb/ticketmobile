@@ -1,0 +1,10 @@
+html, body {
+  font-size:1.333333333vw !important;
+  width: 100%;
+  height: 100%;
+}
+@media (min-width: 560px) {
+  html {
+    font-size: 54px;
+  }
+}
