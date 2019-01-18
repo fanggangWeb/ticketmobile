@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <!-- 公用组件库开始 -->
+  <link rel="stylesheet" href="css/weui.1.1.3.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.1.2.1.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.0.8.3.min.css">
+  <link rel="stylesheet" href="css/swiper.4.4.2.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <script src="lib/jquery-3.3.1.js"></script>
+  <script src="lib/swiper.4.4.2.min.js"></script>
+  <script src="lib/vue.js"></script>
+  <script src="js/config.js"></script>
+  <script src="lib/jquery-weui.1.2.1.min.js"></script>
+  <!-- 公用组件库结束 -->
+  <title>提现</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top-bg"></div>
+    <div class="top">
+      <div class="top-left">
+        <div class="top-text">付款给商家</div>
+        <div class="shop-name">{{allInfo.name}}</div>
+      </div>
+      <div class="top-right">
+        <img :src="imageUrl+allInfo.file.url" alt="">
+      </div>
+    </div>
+    <div class="withdraw">
+      <div class="withdraw-top">金额</div>
+      <div class="weui-cells weui-cells_form withdraw-form">
+        <div class="weui-cell">
+          <div class="weui-cell__hd"><label class="weui-label">￥</label></div>
+          <div class="weui-cell__bd">
+            <input class="weui-input" v-model="withdrawNumber"  type="number" pattern="[0-9]*" placeholder="输入付款金额">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="confirm-btn">付款</div>
+    </div>
+  </div>
+</body>
+<script>
+  $(function () {
+    let that
+    let Id = getParam('id')
+    var vm = new Vue({
+      el: ".container",
+      data() {
+        return {
+          cardNumber: '',
+          lastNumber: 0,
+          withdrawNumber: '',
+          imageUrl: apiUrl,
+          allInfo: {
+            file:{}
+          }
+        }
+      },
+      mounted () {
+        that = this
+        this.getShopInfo()
+      },
+      methods: {
+        takeAll () {
+          this.withdrawNumber = this.lastNumber
+        },
+        getShopInfo () {
+          Ajax({
+            type: 'get',
+            url: apiUrl + '/userInfo/myWallet?id='+Id,
+            // contentType: "application/json;charset=UTF-8",
+            // data: data,
+            success: function (res) {
+              if (res.state == _OK) {
+                res = res.data
+                that.allInfo = res
+                // console.log(res)
+              } else if (res.state == NoLogin) {
+                $.alert(res.message)
+                  setTimeout(()=> {
+                    location.href = "./login.html"
+                  },1000)
+              } else {
+                $.alert(res.message)
+              }
+            }
+          })
+        }
+      }
+    })
+  })
+</script>
+<style>
+  .container {
+    width: 100%;
+    height: 100%;
+    background: #F2F2F2;
+    overflow-y: auto;
+    color: #4d4d4d;
+    box-sizing: border-box;
+    /* padding-bottom: 1.4rem; */
+    padding: 0.3rem;
+  }
+  .top-bg {
+    width: 100%;
+    height: 0.15rem;
+    background: #2F8BFF;
+    border-top-right-radius: 0.2rem;
+    border-top-left-radius: 0.2rem;
+  }
+  .top {
+    width: 100%;
+    height: 1.6rem;
+    background: #f9f9f9;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 0.36rem;
+  }
+  .top-left{
+    width: calc(100% - 1rem);
+  }
+  .top-text {
+    font-size: 0.28rem;
+  }
+  .shop-name {
+    font-size: 0.24rem;
+    color: #9d9d9d;
+  }
+  .top-right {
+    width: 0.84rem;
+    height: 0.84rem;
+    margin-left: auto;
+  }
+  .top-right img{
+    width: 100%;
+    height: 100%;
+  }
+  .withdraw {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.2rem 0.4rem 0 0.4rem; 
+    background: white;
+    /* border-bottom-right-radius: 0.2rem;
+    border-bottom-left-radius: 0.2rem; */
+  }
+  .withdraw-top {
+    padding-top: 0.5rem;
+    font-size: 0.26rem;
+    color: #9d9d9d;
+  }
+  .withdraw .weui-cell {
+    font-size: 0.54rem;
+    padding: 10px 0px;
+  }
+  .withdraw .weui-label {
+    width: 0.8rem;
+  }
+  .withdraw .weui-cell:before,.weui-cells::before {
+    border-top: none !important;
+  }
+  .weui-cells {
+    font-size: 0.32rem;
+  }
+  .weui-cell {
+    height: 1rem;
+  }
+  .bank-form {
+    border-bottom-right-radius: 0.2rem;
+    border-bottom-left-radius: 0.2rem;
+  }
+  .bottom {
+    width: 100%;
+    height: 2.25rem;
+    display: flex;
+    justify-content: center;
+    -webkit-justify-content: center;
+    align-items: center;
+    -webkit-align-items: center;
+    background: white;
+  }
+  .confirm-btn {
+    width: 6rem;
+    height: 1rem;
+    background: #2F8BFF;
+    line-height: 1rem;
+    text-align: center;
+    letter-spacing: 0.03rem;
+    color: white;
+    font-size: 0.32rem;
+    font-weight: bold;
+    border-radius: 0.1rem;
+  }
+  
+</style>
+
+</html>

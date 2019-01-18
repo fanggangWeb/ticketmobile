@@ -1,10 +1,83 @@
 html, body {
-  font-size:1.333333333vw !important;
+  font-size:13.33333333vw !important;
   width: 100%;
   height: 100%;
+  font-family:Microsoft YaHei !important;
 }
 @media (min-width: 560px) {
   html {
     font-size: 54px;
   }
+}
+a {
+  color: #4d4d4d;
+}
+a:active,a:after {
+  color: #4d4d4d;
+}
+.weui-pull-to-refresh-layer {
+  height: 30px;
+  line-height: 30px;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.12rem;
+}
+/* 日期选择器 自适应样式调整 草柠檬 */
+.toolbar, .toolbar .title {
+  font-size: 0.28rem !important;
+}
+i.icon.icon-next, i.icon.icon-prev {
+  width: 0.28rem !important;
+  height: 0.28rem !important;
+}
+.weui-picker-calendar {
+  height: 9.6rem;
+}
+.toolbar .toolbar-inner {
+  height: 1.2rem;
+  align-items: center;
+  -webkit-align-items: center;
+}
+.picker-calendar-month-picker, .picker-calendar-year-picker {
+  height: 1.2rem;
+  line-height: 1.2rem;
+}
+.picker-calendar-month-picker .current-month-value, .picker-calendar-month-picker .current-year-value, .picker-calendar-year-picker .current-month-value, .picker-calendar-year-picker .current-year-value {
+  height: 1.2rem;
+  line-height: 1.2rem;
+}
+.picker-calendar-month-picker a.icon-only, .picker-calendar-year-picker a.icon-only {
+  height: 1.2rem;
+  line-height: 1.2rem;
+}
+.picker-calendar-week-days {
+  align-items: center;
+  -webkit-align-items: center;
+}
+.picker-calendar-row {
+  height: 1.2rem;
+}
+/* 日期选择器 自适应样式充值 草柠檬 */
+.weui-cells_form {
+  margin-top: 0px;
+}
+.container {
+  font-size: 0.32rem;
+}
+/* 改变placeholder颜色 */
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+  color:    #9d9d9d;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+  color:    #9d9d9d;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+  color:    #9d9d9d;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color:    #9d9d9d;
+}
+/* 改变alert提示框通用样式 */
+.weui-dialog__hd {
+  padding: 0px;
 }

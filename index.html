@@ -8,36 +8,629 @@
   <link rel="stylesheet" href="./css/reset.css">
   <link rel="stylesheet" href="./css/index.css">
   <!-- 公用组件库开始 -->
-  <link rel="stylesheet" href="//cdn.bootcss.com/weui/0.4.3/style/weui.min.css">
-  <link rel="stylesheet" href="//cdn.bootcss.com/jquery-weui/0.8.3/css/jquery-weui.min.css">
+  <link rel="stylesheet" href="css/weui.1.1.3.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.1.2.1.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.0.8.3.min.css">
+  <link rel="stylesheet" href="css/swiper.4.4.2.css">
   <link rel="stylesheet" href="./css/common.css">
   <script src="lib/jquery-3.3.1.js"></script>
-  <script src="//cdn.bootcss.com/jquery-weui/0.8.3/js/jquery-weui.min.js"></script>
+  <script src="lib/swiper.4.4.2.min.js"></script>
+  <script src="lib/vue.js"></script>
+  <script src="js/config.js"></script>
+  <script src="lib/jquery-weui.1.2.1.min.js"></script>
   <!-- 公用组件库结束 -->
-  <script src="js/index.js"></script>
   <title>首页</title>
 </head>
 
 <body>
-  <div class="list" style="height:600px;">
-    <div class="weui-pull-to-refresh-layer">
-      <div class="pull-to-refresh-arrow"></div> <!-- 上下拉动的时候显示的箭头 -->
-      <div class="pull-to-refresh-preloader"></div> <!-- 正在刷新的菊花 -->
-      <div class="down">下拉刷新</div><!-- 下拉过程显示的文案 -->
-      <div class="up">释放刷新</div><!-- 下拉超过50px显示的文案 -->
-      <div class="refresh">正在刷新...</div><!-- 正在刷新时显示的文案 -->
+  <div class="container">
+    <div id="banner">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide" v-for="(item, index) in bannerList" :key="index">
+            <img :src="imageUrl+item.file.url" alt="">
+          </div>
+          <!-- <div class="swiper-slide">
+            <img src="./img/index/banner.png" alt="">
+          </div>
+          <div class="swiper-slide">
+            <img src="./img/index/banner.png" alt="">
+          </div> -->
+        </div>
+        <!-- 如果需要分页器 -->
+        <div class="swiper-pagination"></div>
+      </div>
     </div>
-    <div class="list-content">
-      12314
+    <div class="shop-container">
+      <div class="shop-left scenic-left" @click="go('./secnicList.html')">
+        <div class="shop-text">门票/景点</div>
+      </div>
+      <div class="shop-right">
+        <div class="shop-type" v-for="(item, index) in typeList1" @click="goScenic(item)" :key="item.name">{{item.name}}</div>
+      </div>
+    </div>
+    <div class="shop-container">
+      <div class="shop-left store-left" @click="go('./storeList.html')">
+        <div class="shop-text">店铺</div>
+      </div>
+      <div class="shop-right">
+        <div class="shop-type" v-for="(item, index) in typeList2" @click="goStore(item)" :key="item.name">{{item.name}}</div>
+        <div class="longType" v-for="(item, index) in longType" @click="goStore(item)" :key="item.name">{{item.name}}</div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab" :class="{active:index == currentIndex}" v-for="(item, index) in tabList" @click="changeTab(item,index)" :key="item.name" >
+        {{item.name}}
+      </div>
+    </div>
+    <div class="list-container">
+      <div class="list">
+        <div class="weui-pull-to-refresh-layer">
+          <div class="pull-to-refresh-arrow"></div>
+          <div class="pull-to-refresh-preloader"></div>
+          <div class="down">下拉刷新</div>
+          <div class="up">释放刷新</div>
+          <div class="refresh">正在刷新...</div>
+        </div>
+        <div class="list-content">
+          <div class="nodata" v-if="nodataState">
+            暂时没有数据~~
+          </div>
+          <div class="list-item" @click="goDetail(one)" v-for="one in shopList" :key="one.id">
+            <div class="item-left">
+              <img :src="imageUrl+one.file.url" alt="">
+            </div>
+            <div class="item-right">
+              <div class="item-title">{{one.name}}</div>
+              <div class="item-desc">{{one.describe}}</div>
+              <div v-if="currentIndex == 0" class="item-bottom">
+                <div class="item-price"><span class="price">￥{{one.price}}</span>起</div>
+                <div class="item-score">{{one.score}}分</div>
+              </div>
+              <div v-if="currentIndex == 1" class="item-bottom">
+                <div class="item-tag">{{one.regionName}}|{{one.typeName}}</div>
+                <div class="item-score">{{one.score}}分</div>
+              </div>
+            </div>
+          </div>
+          <div class="more-btn" @clcik="getMoreList" v-if="moreShow">加载更多</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item">
+        <div class="nav-icon home-icon"></div>
+        <div class="nav-text">首页</div>
+      </div>
+      <div class="nav-item" @click="go('order.html')">
+        <div class="nav-icon order-icon"></div>
+        <div class="nav-text">订单</div>
+      </div>
+      <div class="nav-item" @click="goMine">
+        <div class="nav-icon mine-icon"></div>
+        <div class="nav-text">我的</div>
+      </div>
     </div>
   </div>
 </body>
 <script>
-  $(".list").pullToRefresh().on("pull-to-refresh", function () {
-    setTimeout(function () {
-        // $(".list-content").html("");
-        $(".list").pullToRefreshDone(); // 重置下拉刷新
-    }, 1500);   //模拟延迟
-  });
+  $(function () {
+    let that
+    var vm = new Vue({
+      el: ".container",
+      data() {
+        return {
+          page: 1,
+          size: 10,
+          total: 0,
+          moreShow: false,
+          nodataState: false,
+          imageUrl: apiUrl,
+          bannerList: [],
+          shopList: [],
+          typeList1: [{ name: '5A景区', id: 1 }, { name: '都市观光', id: 2 }, { name: '自然风景', id: 3 }, { name: '古色古香', id: 4 }],
+          typeList2: [{ name: '美食小吃', id: 1 }, { name: '百货零食', id: 2 }],
+          longType: [{name: '旅游纪念', id: 3 }],
+          tabList: [{name: '景点推荐'}, {name: '店铺推荐'}],
+          currentIndex: 0
+        }
+      },
+      methods: {
+        changeTab (item, index) {
+          this.currentIndex = index
+          this.page == 1
+          if (index == 0) {
+            this.getScenicList()
+          } else {
+            this.getStoreList()
+          }
+        },
+        goDetail (item) {
+          if (this.currentIndex == 0) {
+            location.href = "./scenicDetail.html?id="+item.id
+          } else {
+            location.href = "./storeDetail.html?id="+item.id
+          }
+        },
+        go (item) {
+          location.href = item
+        },
+        goMine () {
+          let userInfo = localStorage.getItem('userInfo')
+          let authoritiy =  JSON.parse(userInfo).authorities[0].authoritiy
+          
+          if (authoritiy == 'ORDINARY') {
+            location.href = "./mine.html"
+          } else {
+            location.href = './shopMine.html'
+          }
+        },
+        goScenic (item) {
+          location.href = './secnicList.html?typeId='+item.id
+        },
+        goStore (item) {
+          location.href = './storeList.html?typeId='+item.id
+        },
+        judgeList (data) {
+          if (data.total == 0) {
+            that.nodataState = true
+            that.moreShow = false
+          } else if (that.shopList.length < data.total) {
+            that.nodataState = false
+            that.moreShow = true
+          } else {
+            that.nodataState = false
+            that.moreShow = false
+          }
+        },
+        // 点击加载更多获取更多数据
+        getMoreList () {
+          this.page++
+          if (this.currentIndex == 0) {
+            const data = {
+              page: that.page,
+              size: that.size
+            }
+            Ajax({
+              type: 'get',
+              url: apiUrl + '/scenicSpot/pageQueryRecommendList',
+              // contentType: "application/json;charset=UTF-8",
+              data: data,
+              success: function (res) {
+                if (res.state == _OK) {
+                  if (res.state == _OK) {
+                    res = res.data
+                    that.total = res.total
+                    that.shopList = that.shopList.concat(res.rows)
+                    that.judgeList(res)
+                  }
+                } else if (res.state == NoLogin) {
+                  $.alert(res.message)
+                  setTimeout(()=> {
+                    location.href = "./login.html"
+                  },1000)
+                } else {
+                  $.alert(res.message)
+                }
+              }
+            })
+          } else {
+            const data = {
+              page: that.page,
+              size: that.size
+            }
+            Ajax({
+              type: 'get',
+              url: apiUrl + '/shop/pageQueryRecommendList',
+              // contentType: "application/json;charset=UTF-8",
+              data: data,
+              success: function (res) {
+                if (res.state == _OK) {
+                  res = res.data
+                  that.total = res.total
+                  that.shopList = that.shopList.concat(res.rows)
+                  that.judgeList(res)
+                } else if (res.state ==NoLogin) {
+                  $.alert(res.message)
+                  setTimeout(()=> {
+                    location.href = "./login.html"
+                  },1000)
+                } else {
+                  $.alert(res.message)
+                }
+              }
+            })
+          }
+        },
+        // 推荐店铺
+        getStoreList () {
+          const data = {
+            page: that.page,
+            size: that.size
+          }
+          Ajax({
+            type: 'get',
+            url: apiUrl + '/shop/pageQueryRecommendList',
+            // contentType: "application/json;charset=UTF-8",
+            data: data,
+            success: function (res) {
+              if (res.state == _OK) {
+                res = res.data
+                that.total = res.total
+                that.shopList = res.rows
+                that.judgeList(res)
+              } else if (res.state == NoLogin|| res.state == 400) {
+                $.alert(res.message)
+                  setTimeout(()=> {
+                    location.href = "./login.html"
+                  },1000)
+              } else {
+                $.alert(res.message)
+              }
+            }
+          })
+        },
+        // 获取轮播图
+        getBannerList () {
+          const data = {
+            page: 1,
+            size: 100
+          }
+          Ajax({
+            type: 'post',
+            url: apiUrl + '/banner/pageQuery?page=1&size=100',
+            // contentType: "application/json;charset=UTF-8",
+            data: data,
+            success: function (res) {
+              if (res.state == _OK) {
+                res = res.data
+                this.bannerList = res.rows
+              } else if (res.state ==NoLogin|| res.state == 400) {
+                $.alert(res.message)
+                  setTimeout(()=> {
+                    location.href = "./login.html"
+                  },1000)
+              } else {
+                $.alert(res.message)
+              }
+            }
+          })
+        },
+        // 推荐景点
+        getScenicList () {
+          const data = {
+            page: that.page,
+            size: that.size
+          }
+          Ajax({
+            type: 'get',
+            url: apiUrl + '/scenicSpot/pageQueryRecommendList',
+            // contentType: "application/json;charset=UTF-8",
+            data: data,
+            success: function (res) {
+              if (res.state == _OK) {
+                if (res.state == _OK) {
+                  res = res.data
+                  that.total = res.total
+                  that.shopList = res.rows
+                  that.judgeList(res)
+                } else if (res.state ==NoLogin|| res.state == 400) {
+                  $.alert(res.message)
+                  setTimeout(()=> {
+                    location.href = "./login.html"
+                  },1000)
+                } else {
+                $.alert(res.message)
+              }
+              }
+            }
+          })
+        },
+        init: function () {
+          $(".list").pullToRefresh().on("pull-to-refresh", function () {
+            setTimeout(function () {
+              that.page = 1
+              if (that.currentIndex == 0) {
+                that.getScenicList()
+              } else {
+                that.getStoreList()
+              }
+              $(".list").pullToRefreshDone(); // 重置下拉刷新
+            }, 1500); //模拟延迟
+          });
+        }
+      },
+      mounted () {
+        that = this
+        this.init()
+        this.getScenicList()
+        this.getBannerList()
+      }     
+    })
+    function setSwiper() {
+      var mySwiper = new Swiper('.swiper-container', {
+        direction: 'horizontal', // 垂直切换选项
+        loop: true, // 循环模式选项
+        observer: true,
+        observeParents: true,
+        slidesPerview: 'auto',
+        autoplay: {
+          disableOnInteraction: false, //默认true
+          delay: 3000, //默认3000
+        },
+        autoplayDisableOnInteraction: false,
+        speed: 500,
+        // 如果需要分页器
+        pagination: {
+          el: '.swiper-pagination',
+        },
+        // 如果需要前进后退按钮
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        // 如果需要滚动条
+        scrollbar: {
+          el: '.swiper-scrollbar',
+        },
+      })
+    }
+    setSwiper()
+  })
 </script>
+<style>
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 1.4rem;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    -webkit-align-items: center;
+    justify-content: space-around;
+    -webkit-justify-content: space-around;
+    background: white;
+    border-top: 0.01rem #F5F4F4 solid;
+  }
+  .nav-item {
+    width: 0.6rem;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    -webkit-justify-content: center;
+  }
+  .nav-icon {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+  .home-icon {
+    background-image: url("./img/homechosen.png");
+  }
+  .order-icon {
+    background-image: url("./img/order.png");
+  }
+  .mine-icon {
+    background-image: url("./img/mine.png");
+  }
+  .nav-text {
+    font-size: 0.2rem;
+    margin-top: 0.15rem;
+  }
+  .container {
+    width: 100%;
+    height: 100%;
+    background: #F5F4F4;
+    overflow-y: auto;
+    color: #4d4d4d;
+    box-sizing: border-box;
+    padding-bottom: 1.4rem;
+  }
+  .swiper-container {
+    height: 2.96rem;
+    box-sizing: border-box;
+  }
+  .swiper-container img {
+    width: 100%;
+    height: 100%;
+  }
+  .shop-container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 3.08rem;
+    padding: 0.26rem;
+    background: #F5F4F4;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .shop-container:nth-child(3) {
+    margin-top: -0.26rem;
+  }
+  .shop-left {
+    height: 100%;
+    width: 2.56rem;
+    position: relative;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+  .shop-text {
+    color: white;
+    font-size: 0.30rem;
+    position: absolute;
+    top: 0.2rem;
+    right: 0.2rem;
+  }
+  .scenic-left {
+    background-image: url("./img/index/scenicspot.png"); 
+  }
+  .store-left {
+    background-image: url('./img/index/store.png')
+  }
+  .shop-right {
+    box-sizing: border-box;
+    width: calc(100% - 2.56rem);
+    height: 100%;
+    padding-left: 0.26rem;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.3rem;
+    text-align: center;
+    line-height: 1.2rem;
+  }
+
+  .shop-type {
+    width: 2rem;
+    height: 1.2rem;
+    background: white;
+    margin-bottom: 0.15rem;
+  }
+  .longType {
+    height: 1.2rem;
+    background: white;
+    width: 4.1rem;
+  }
+  .shop-type:nth-child(even) {
+    margin-left: 0.1rem;
+  }
+  .tab-bar {
+    height: 0.88rem;
+    background: white;
+    z-index: 2;
+    border-bottom: 0.01rem #F5F4F4 solid;
+    display: flex;
+  }
+  .tab {
+    height: 100%;
+    line-height: 0.88rem;
+    text-align: center;
+    color: #9C9C9C;
+    font-size: 0.24rem;
+    padding: 0 0.3rem;
+  }
+  .tab.active {
+    color: #707070;
+    font-size: 0.28rem;
+    font-weight: bold;
+  }
+  .tab.active::after {
+    content: '';
+    display:block;
+    width: 0.6rem;
+    height: 0.06rem;
+    background: #4D78EF;
+    margin: -0.06rem 0 0 calc(50% - 0.3rem);
+  }
+  .list-container {
+    overflow: hidden;
+  }
+  .list {
+    width: 100%;
+    min-height: 300px;
+  }
+  .list-item {
+    width: 100%;
+    height: 2.3rem;
+    background: white;
+    box-sizing: border-box;
+    padding: 0.34rem 0.32rem;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .item-left {
+    width: 2.34rem;
+    height: 100%;
+  }
+  .item-left img {
+    width: 100%;
+    height: 100%;
+  }
+  .item-right {
+    width: calc(100% - 2.34rem);
+    height: 100%;
+    box-sizing: border-box;
+    padding-left: 0.26rem;
+    position: relative;
+  }
+  .item-title {
+    width: 100%;
+    height: 0.44rem;
+    line-height: 0.44rem;
+    font-size: 0.32rem;
+    color: #707070;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    letter-spacing: 0.01rem;
+  }
+  .item-desc {
+    width: 100%;
+    height: 0.62rem;
+    line-height: 0.31rem;
+    font-size: 0.24rem;
+    color: #9d9d9d;
+    letter-spacing: 0.01rem;
+    overflow: hidden;
+    text-overflow: ellipsis; /*设置成弹性盒子 */
+    display: -webkit-box; /*显示的个数 */
+    -webkit-line-clamp: 2; /* 属性规定框的子元素应该被水平或垂直排列。 */
+    -webkit-box-orient: vertical;
+  }
+  .item-bottom {
+    box-sizing: border-box;
+    /* padding-right: 0.32rem; */
+    width: 100%;
+    height: 0.56rem;
+    line-height: 0.56rem;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+  }
+  .item-price {
+    color: #888888;
+    font-size: 0.20rem;
+  }
+  .price {
+    font-size: 0.36rem;
+    color: #F14646;
+  }
+  .item-tag {
+    color: #F46A21;
+    font-size: 0.2rem;
+    height: 0.36rem;
+    line-height: 0.36rem;
+    padding: 0 0.2rem;
+    border: 0.01rem solid #F46A21;
+    border-radius: 0.16rem;
+  }
+  .item-score {
+    font-size: 0.26rem;
+    color: #F68B39;
+  }
+  .nodata {
+    height: 0.8rem;
+    background: white;
+    line-height: 0.8rem;
+    text-align: center;
+    font-size: 0.3rem;
+    letter-spacing: 0.01rem;
+  }
+  .more-btn {
+    background: #4D78EF;
+    width: 2.5rem;
+    height: 0.6rem;
+    line-height: 0.6rem;
+    font-size: 0.26rem;
+    color: white;
+    border-radius: 0.16rem;
+    text-align: center;
+    margin: 0.3rem 0  0.3rem calc(50% - 1.25rem);
+  }
+</style>
+
 </html>

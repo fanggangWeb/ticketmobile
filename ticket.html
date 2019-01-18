@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <!-- 公用组件库开始 -->
+  <link rel="stylesheet" href="css/weui.1.1.3.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.1.2.1.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.0.8.3.min.css">
+  <link rel="stylesheet" href="css/swiper.4.4.2.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <script src="lib/jquery-3.3.1.js"></script>
+  <script src="lib/swiper.4.4.2.min.js"></script>
+  <script src="lib/vue.js"></script>
+  <script src="js/config.js"></script>
+  <script src="lib/jquery-weui.1.2.1.min.js"></script>
+  <!-- 公用组件库结束 -->
+  <title>景区购票</title>
+</head>
+
+<body>
+  <div class="all">
+    <div class="container">
+      <div class="ticket-info">
+        <div class="ticket-top">
+          <div class="ticket-title">{{allInfo.name}}</div>
+          <div class="ticket-tag">
+            <div class="tags" v-for="(item, index) in allInfo.ticketTypes" :key="item.id">
+              <div class="tag-icon"></div>
+              <div class="tag-text">{{item.name}}</div>
+            </div>
+            <div class="notice" @click="popupState = true">
+              <div class="notice-text">购买须知</div>
+              <div class="notice-icon"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ticket-date">
+          <div class="ticket-text">日期</div>
+          <input type="text" data-toggle='date' id="dateChoose" />
+        </div>
+        <div class="ticket-number">
+          <div class="ticket-text">购买数量</div>
+          <div class="ticket-select">
+            <div class="minus" @click="minus"></div>
+            <div class="number">{{ticketNumber}}</div>
+            <div class="add" @click="add"></div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab" :class="{active:index == currentIndex}" v-for="(item, index) in tabList" @click="changeTab(item,index)"
+          :key="index">
+          {{item.name}}
+        </div>
+      </div>
+      <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+          <div class="weui-cell__hd"><label class="weui-label">游客名</label></div>
+          <div class="weui-cell__bd">
+            <input class="weui-input" v-model="contact" placeholder="请填写姓名">
+          </div>
+        </div>
+        <div class="weui-cell">
+          <div class="weui-cell__hd"><label class="weui-label">手机号</label></div>
+          <div class="weui-cell__bd">
+            <input class="weui-input" v-model="phoneNumber" type="number" pattern="[0-9]*" placeholder="请填写手机号">
+          </div>
+        </div>
+      </div>
+      <div class="confirm-buy BTN">
+        <div class="all-price">
+          <div class="price">￥{{money}}</div>
+          <div class="price-text">合计总价</div>
+        </div>
+        <div class="confirm-btn" @click="orderSumbit">
+          提交订单
+        </div>
+      </div>
+    </div>
+    <div class="popup" v-show="popupState">
+      <div class="popup-content">
+        <div class="pop-title">购买须知</div>
+        <div class="notice-content">
+          <div class="notice-title">开放时间</div>
+          <div class="notice-desc">{{notice.openTime}}</div>
+          <div class="notice-title">优惠政策</div>
+          <div class="notice-desc">{{notice.policy}}</div>
+          <div class="notice-title">温馨提示</div>
+          <div class="notice-desc">{{notice.tips}}</div>
+        </div>
+        <div class="close-btn" @click="popupState=false">关闭</div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  $(function () {
+    let scenicInfo = JSON.parse(sessionStorage.getItem('scenicInfo'))
+    let mustknow = JSON.parse(sessionStorage.getItem('mustknow'))
+    let that
+    var vm = new Vue({
+      el: ".all",
+      data() {
+        return {
+          shopList: [],
+          tabList: [{
+            name: '联系人'
+          }],
+          currentIndex: 0,
+          ticketNumber: 1,
+          popupState: false,
+          allInfo: scenicInfo,
+          notice: mustknow,
+          contact: '',
+          phoneNumber: '',
+          singlePrice: 0,
+          money: 0
+        }
+      },
+      mounted () {
+        that = this
+        this.singlePrice = scenicInfo.price
+        this.money = scenicInfo.price
+      },
+      methods: {
+        changeTab(item, index) {
+          this.currentIndex = index
+        },
+        getAllMoney () {
+          this.money = this.singlePrice * this.ticketNumber
+        },
+        minus() {
+          if (this.ticketNumber <= 1) {
+            return false
+          } else {
+            this.ticketNumber--
+          }
+          this.getAllMoney()
+        },
+        add() {
+          this.ticketNumber++
+          this.getAllMoney()
+        },
+        orderSumbit () {
+          var date = new Date($("#dateChoose").val())
+          if (!that.allInfo.id) {
+            $.alert('未找到门票信息')
+            return false
+          }
+          if (date == '') {
+            $.alert('请选择游玩日期')
+            return false
+          } else if (this.contact == '') {
+            $.alert('请填写联系人姓名')
+            return false
+          }else if (this.phoneNumber == '') {
+            $.alert('请填写联系人电话')
+            return false
+          }
+          date = Date.parse(date)
+          date = timestampToTime(date)
+          const data = {
+            ticketId: that.allInfo.id,
+            name: this.contact,
+            phone: this.phoneNumber,
+            playTime: date,
+            num: this.ticketNumber
+          }
+          Ajax({
+            type: 'post',
+            url: apiUrl + '/scenicSpotOder/getTickets',
+            // contentType: "application/json;charset=UTF-8",
+            data: data,
+            success: function (res) {
+              if (res.state == _OK) {
+                res = res.data
+                location.href = './scenicOrder.html?id='+res.id
+              } else if (res.state == NoLogin) {
+                $.alert(res.message)
+                setTimeout(()=> {
+                  location.href = "./login.html"
+                },1000)
+              } else {
+                $.alert(res.message)
+              }
+            }
+          })
+        }
+      }
+    })
+    $("#dateChoose").calendar();
+    // $(".list").pullToRefresh().on("pull-to-refresh", function () {
+    //   setTimeout(function () {
+    //     // $(".list-content").html("");
+    //     $(".list").pullToRefreshDone(); // 重置下拉刷新
+    //   }, 1500); //模拟延迟
+    // });
+  })
+</script>
+<style>
+  .all {
+    width: 100%;
+    height: 100%;
+  }
+  .container {
+    width: 100%;
+    height: 100%;
+    background: #F5F4F4;
+    overflow-y: auto;
+    color: #4d4d4d;
+    box-sizing: border-box;
+    padding-bottom: 1.2rem;
+  }
+  .ticket-info {
+    width: 100%;
+    background: white;
+    box-sizing: border-box;
+    padding: 0.3rem 0.3rem 0 0.3rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .ticket-top {
+    border-bottom: 0.01rem #F5F4F4 solid;
+  }
+
+  .ticket-title {
+    width: 100%;
+    /* height: 0.56rem; */
+    line-height: 0.56rem;
+    letter-spacing: 0.01rem;
+    font-size: 0.4rem;
+    font-weight: bold;
+    /* overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; */
+  }
+
+  .ticket-tag {
+    height: 0.4rem;
+    display: flex;
+    flex-wrap: nowrap;
+    font-size: 0.2rem;
+    color: #4D78EF;
+    align-items: center;
+    -webkit-align-items: center;
+    margin-top: 0.2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    -webkit-align-items: center;
+    margin-right: 0.2rem;
+  }
+
+  .tags:last-child {
+    margin-right: 0px;
+  }
+
+  .tag-icon {
+    width: 0.24rem;
+    height: 0.24rem;
+    margin-right: 0.1rem;
+    background-image: url('./img/right.png');
+    background-size: 100% 100%;
+  }
+
+  .notice {
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+    -webkit-align-items: center;
+  }
+
+  .notice-text {
+    color: #C9C9C9;
+    font-size: 0.20rem;
+    margin-right: 0.25rem;
+  }
+
+  .notice-icon {
+    width: 0.24rem;
+    height: 0.20rem;
+    background-image: url("./img/arrow-right.png");
+    background-size: 100% 100%;
+  }
+
+  .ticket-date {
+    height: 1.50rem;
+    display: flex;
+    align-items: center;
+    -webkit-align-items: center;
+    border-bottom: 0.01rem #F5F4F4 solid;
+  }
+
+  .ticket-text {
+    font-size: 0.28rem;
+    letter-spacing: 0.01rem;
+  }
+
+  #dateChoose {
+    height: 0.92rem;
+    width: 2rem;
+    border: 0.01rem #D7DBE8 solid;
+    border-radius: 0.1rem;
+    background: rgba(120, 169, 252, 0.4);
+    color: #4d4d4d;
+    font-size: 0.26rem;
+    margin-left: auto;
+    text-align: center;
+  }
+
+  .ticket-number {
+    height: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+  }
+
+  .ticket-select {
+    font-size: 0.28rem;
+    display: flex;
+  }
+
+  .minus,
+  .add {
+    width: 0.48rem;
+    height: 0.48rem;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    cursor: pointer;
+  }
+
+  .number {
+    margin: 0 0.4rem 0 0.4rem;
+  }
+
+  .minus {
+    background-image: url("./img/minus.png");
+  }
+
+  .add {
+    background-image: url("./img/add.png");
+  }
+
+  .tab-bar {
+    height: 0.88rem;
+    background: white;
+    z-index: 2;
+    border-bottom: 0.01rem #F5F4F4 solid;
+    display: flex;
+  }
+
+  .tab {
+    height: 100%;
+    line-height: 0.88rem;
+    text-align: center;
+    color: #9C9C9C;
+    font-size: 0.24rem;
+    padding: 0 0.3rem;
+  }
+
+  .tab.active {
+    color: #707070;
+    font-size: 0.28rem;
+    font-weight: bold;
+  }
+
+  .tab.active::after {
+    content: '';
+    display: block;
+    width: 0.6rem;
+    height: 0.06rem;
+    background: #4D78EF;
+    margin: -0.06rem 0 0 calc(50% - 0.3rem);
+  }
+
+  .weui-cells {
+    font-size: 0.24rem;
+  }
+
+  .weui-cell {
+    height: 0.55rem;
+  }
+
+  .confirm-buy {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 1.2rem;
+    background: white;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+  }
+
+  .all-price {
+    margin-left: 0.3rem;
+  }
+
+  .price {
+    font-size: 0.34rem;
+    font-weight: bold;
+    color: #F14646;
+  }
+
+  .price-text {
+    font-size: 0.16rem;
+  }
+
+  .confirm-btn {
+    width: 1.76rem;
+    height: 100%;
+    line-height: 1.2rem;
+    text-align: center;
+    color: white;
+    font-size: 0.28rem;
+    font-weight: bold;
+    background: #4D78EF;
+  }
+
+  .popup {
+    position: absolute;
+    top: 0;
+    z-index: 99;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: rgba(185,185,185,0.4);
+  }
+
+  .popup-content {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    background: white;
+  }
+
+  .pop-title {
+    width: 100%;
+    height: 1rem;
+    text-align: center;
+    font-size: 0.32rem;
+    font-weight: bold;
+    line-height: 1rem;
+    letter-spacing: 0.02rem;
+    border-bottom: 0.01rem #F5F4F4 solid;
+  }
+
+  .notice-content {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.26rem;
+  }
+
+  .notice-title {
+    width: 100%;
+    line-height: 0.5rem;
+    font-size: 0.24rem;
+    font-weight: bold;
+  }
+
+  .notice-desc {
+    width: 100%;
+    color: #888888;
+    font-size: 0.24rem;
+    line-height: 0.36rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .close-btn {
+    height: 1rem;
+    width: 100%;
+    background: #4D78EF;
+    color: white;
+    font-weight: bold;
+    font-size: 0.36rem;
+    text-align: center;
+    line-height: 1rem;
+    letter-spacing: 0.03rem;
+  }
+</style>
+
+</html>

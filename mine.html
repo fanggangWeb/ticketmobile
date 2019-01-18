@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <!-- 公用组件库开始 -->
+  <link rel="stylesheet" href="css/weui.1.1.3.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.1.2.1.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.0.8.3.min.css">
+  <link rel="stylesheet" href="css/swiper.4.4.2.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <script src="lib/jquery-3.3.1.js"></script>
+  <script src="lib/swiper.4.4.2.min.js"></script>
+  <script src="lib/vue.js"></script>
+  <script src="js/config.js"></script>
+  <script src="lib/jquery-weui.1.2.1.min.js"></script>
+  <!-- 公用组件库结束 -->
+  <title>我的</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="my-info">
+      <div class="avatar">
+        <img src="./img/index/store.png" alt="">
+      </div>
+      <div class="nickname">{{userInfo.username}}</div>
+    </div>
+    <!-- <div class="menu">
+      <div class="menu-list" @click="go(item.go)" v-for="(item, index) in menuList" :key="index">
+        <div class="menu-name">{{item.name}}</div>
+        <div class="menu-arrow">></div>
+      </div>
+    </div> -->
+    <div class="nav-bar">
+      <div class="nav-item">
+        <a href="./index.html">
+          <div class="nav-icon home-icon"></div>
+          <div class="nav-text">首页</div>
+        </a>
+      </div>
+      <div class="nav-item" @click="go('order.html')">
+        <div class="nav-icon order-icon"></div>
+        <div class="nav-text">订单</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon mine-icon"></div>
+        <div class="nav-text">我的</div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  $(function () {
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    var vm = new Vue({
+      el: ".container",
+      data() {
+        return {
+          userInfo: userInfo,
+          menuList: [{name: '消费记录', go: 'profit.html'}]
+        }
+      },
+      methods: {
+        changeTab (item, index) {
+          this.currentIndex = index
+        },
+        go (item) {
+          location.href = item
+        }
+      }
+    })
+  })
+</script>
+<style>
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 1.4rem;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    -webkit-align-items: center;
+    justify-content: space-around;
+    -webkit-justify-content: space-around;
+    background: white;
+  }
+  .nav-item {
+    width: 0.6rem;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    -webkit-justify-content: center;
+    cursor: pointer;
+  }
+  .nav-icon {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+  .home-icon {
+    background-image: url("./img/home.png");
+  }
+  .order-icon {
+    background-image: url("./img/order.png");
+  }
+  .mine-icon {
+    background-image: url("./img/minechosen.png");
+  }
+  .nav-text {
+    font-size: 0.2rem;
+    margin-top: 0.15rem;
+  }
+  .container {
+    width: 100%;
+    height: 100%;
+    background-image: url('./img/minebg.png');
+    background-size: 100% 100%;
+    overflow-y: auto;
+    color: #4d4d4d;
+    box-sizing: border-box;
+    padding-bottom: 1.4rem;
+  }
+  .my-info {
+    height: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    -webkit-justify-content: center;
+    align-items: center;
+    -webkit-align-item: center;
+  }
+  .avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 2rem;
+    background: white;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    -webkit-justify-content: center;
+    align-items: center;
+    -webkit-align-items: center;
+  }
+  .avatar img {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 1.9rem;
+  }
+  .nickname {
+    font-size: 0.36rem;
+    color: white;
+    margin-top: 0.4rem;
+  }
+  .menu {
+    width: 100%;
+    height: calc(100% - 4rem);
+    background: white;
+    box-sizing: border-box;
+    border-bottom: 0.01rem #F5F4F4 solid;
+    border-top-left-radius: 0.4rem;
+    border-top-right-radius: 0.4rem;
+  }
+  .menu-list {
+    width: 100%;
+    height: 1.6rem;
+    display: flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+    font-size: 0.32rem;
+    font-weight: bold;
+    box-sizing: border-box;
+    padding: 0 0.5rem;
+    border-bottom: 0.01rem #F5F4F4 solid;
+    letter-spacing: 0.01rem;
+  }
+  .menu-arrow {
+    font-weight: normal;
+  }
+  
+</style>
+
+</html>

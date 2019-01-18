@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <!-- 公用组件库开始 -->
+  <link rel="stylesheet" href="css/weui.1.1.3.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.1.2.1.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.0.8.3.min.css">
+  <link rel="stylesheet" href="css/swiper.4.4.2.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <script src="lib/jquery-3.3.1.js"></script>
+  <script src="lib/swiper.4.4.2.min.js"></script>
+  <script src="lib/vue.js"></script>
+  <script src="js/config.js"></script>
+  <script src="lib/jquery-weui.1.2.1.min.js"></script>
+  <!-- 公用组件库结束 -->
+  <title>订单详情</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top">
+      <div class="top-img">
+        <img src="./img/index/store.png" alt="">
+      </div>
+      <div class="top-info">
+        <div class="top-title">一花一叶素餐厅</div>
+        <div class="top-number">3件商品</div>
+      </div>
+      <div class="top-price">
+        <div class="price">￥49</div>
+      </div>
+    </div>
+    <div class="dotted">
+      <img src="./img/dotted.png" alt="">
+    </div>
+    <div class="center">
+      <div class="qrcode">
+        <img src="./img/qr.png" alt="">
+      </div>
+      <div class="center-order">
+        <span class="center-text">订单号：</span>
+        <span class="center-num">123132131312313</span>
+      </div>
+      <div class="warning" style="color:red;font-size: 0.28rem;">请妥善保管好二维码,勿让非工作人员扫描</div>
+    </div>
+    <div class="commodity">
+      <div class="commodity-title">商品列表</div>
+      <div class="commodity-list">
+        <div class="list-left">
+          <img src="./img/index/store.png" alt="">
+        </div>
+        <div class="list-right">
+          <div class="list-top">素食三文鱼沙拉</div>
+          <div class="list-bottom">
+            <div class="list-number">x1</div>
+            <div class="list-price">￥49</div>
+          </div>
+        </div>
+      </div>
+      <div class="commodity-list">
+        <div class="list-left">
+          <img src="./img/index/store.png" alt="">
+        </div>
+        <div class="list-right">
+          <div class="list-top">素食三文鱼沙拉</div>
+          <div class="list-bottom">
+            <div class="list-number">x1</div>
+            <div class="list-price">￥49</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="title">订单信息</div>
+      <div class="info-list">
+        <div class="info-key">订单号码</div>
+        <div class="info-value">胡歌</div>
+      </div>
+      <div class="info-list">
+        <div class="info-key">下单时间</div>
+        <div class="info-value">13629719977</div>
+      </div>
+      <div class="info-list">
+        <div class="info-key">支付方式</div>
+        <div class="info-value">在线支付</div>
+      </div>
+      <div class="info-list">
+        <div class="info-key">商家电话</div>
+        <div class="info-value">13629719977</div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  $(function () {
+    var vm = new Vue({
+      el: ".container",
+      data() {
+        return {
+        }
+      },
+      methods: {
+      }
+    })
+    // $(".list").pullToRefresh().on("pull-to-refresh", function () {
+    //   setTimeout(function () {
+    //     // $(".list-content").html("");
+    //     $(".list").pullToRefreshDone(); // 重置下拉刷新
+    //   }, 1500); //模拟延迟
+    // });
+  })
+</script>
+<style>
+  .container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    color: #4d4d4d;
+    box-sizing: border-box;
+    padding: 0.48rem 0.26rem;
+    background-image: url('./img/orderbg.png');
+    background-size: 100% 100%;
+  }
+  .top {
+    width: 100%;
+    height: 2.25rem;
+    box-sizing: border-box;
+    padding: 0.4rem;
+    background: #edeff1;
+    border-top-left-radius: 0.15rem;
+    border-top-right-radius: 0.15rem;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .top-img {
+    width: 1.4rem;
+    height: 100%;
+  }
+  .top-img img{
+    width: 100%;
+    height: 100%;
+  }
+  .top-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    margin-left: 0.2rem;
+    max-width: 5rem;
+  }
+  .top-title {
+    font-size: 0.32rem;
+    font-weight: bold;
+  }
+  .top-number {
+    font-size: 0.2rem;
+    color: #7e7e7e;
+  }
+  .top-price {
+    margin-left: auto;
+    position: relative;
+    min-width: 1rem;
+  }
+  .price {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: #F14646;
+    font-size: 0.36rem;
+    font-weight: bold;
+  }
+  .dotted {
+    width: 100%;
+    height: 0.33rem;
+    position: relative;
+  }
+  .dotted img {
+    position: absolute;
+    top: -0.02rem;
+    width: 100%;
+    height: 110%;
+  }
+  .center {
+    height: 4.5rem;
+    background: #edeff1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    -webkit-justify-content: center;
+    align-items: center;
+    -webkit-align-items: center;
+    border-bottom: 0.02rem dotted #bdbdbd;
+  }
+  .qrcode {
+    width: 2.6rem;
+    height: 2.6rem;
+    box-sizing: border-box;
+    padding: 0.2rem;
+    background: white;
+  }
+  .qrcode img {
+    width: 100%;
+    height: 100%;
+  }
+  .center-order {
+    height: 0.7rem;
+    padding: 0 0.8rem;
+    line-height: 0.7rem;
+    font-size: 0.24rem;
+    text-align: center;
+    background: #E2E2E2;
+    border: 0.01rem solid #d1d1d1;
+    border-radius: 0.7rem;
+  }
+  .center-text {
+    color: #989898;
+  }
+  .commodity {
+    width: 100%;
+    background: #edeff1;
+    box-sizing: border-box;
+    padding: 0.3rem 0.4rem;
+    border-bottom: 0.02rem dotted #bdbdbd;
+  }
+  .commodity-title {
+    font-size: 0.3rem;
+    font-weight: bold;
+  }
+  .commodity-list {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    height: 1.25rem;
+    box-sizing: border-box;
+    padding: 0.2rem 0;
+    font-size: 0.24rem;
+  }
+  .list-left {
+    width: 0.9rem;
+    height: 100%;
+  }
+  .list-left img{
+    width: 100%;
+    height: 100%;
+  }
+  .list-right {
+    width: calc(100% - 0.9rem);
+    box-sizing: border-box;
+    padding-left: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+  }
+  .list-top {
+    font-weight: bold;
+  }
+  .list-bottom {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  .bottom {
+    background: #edeff1;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.3rem 0.4rem;
+    border-bottom-left-radius: 0.15rem;
+    border-bottom-right-radius: 0.15rem;
+  }
+  .title {
+    font-size: 0.3rem;
+    font-weight: bold;
+  }
+  .info-list {
+    width: 100%;
+    height: 0.8rem;
+    line-height: 0.8rem;
+    font-size: 0.24rem;
+    display: flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+    box-sizing: border-box;
+    background: #edeff1;
+  }
+  .info-key {
+    color: #9D9D9D;
+  }
+</style>
+
+</html>

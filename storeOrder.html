@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <!-- 公用组件库开始 -->
+  <link rel="stylesheet" href="css/weui.1.1.3.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.1.2.1.min.css">
+  <link rel="stylesheet" href="css/jquery-weui.0.8.3.min.css">
+  <link rel="stylesheet" href="css/swiper.4.4.2.css">
+  <link rel="stylesheet" href="./css/common.css">
+  <script src="lib/jquery-3.3.1.js"></script>
+  <script src="lib/swiper.4.4.2.min.js"></script>
+  <script src="lib/vue.js"></script>
+  <script src="js/config.js"></script>
+  <script src="lib/jquery-weui.1.2.1.min.js"></script>
+  <!-- 公用组件库结束 -->
+  <title>支付订单</title>
+</head>
+<body>
+    <div class="container">
+      <div class="store">
+        <div class="store-name">
+          {{allInfo.name}}
+        </div>
+        <div class="food-list">
+          <div class="food" v-for="(item, index) in foodList" :key="index">
+            <div class="food-img">
+              <img :src="imageUrl+item.file.url" alt="">
+            </div>
+            <div class="food-info">
+              <div class="food-name">{{item.name}}</div>
+              <div class="food-num">x{{item.number}}</div>
+            </div>
+            <div class="food-price">￥{{item.price}}</div>
+          </div>
+        </div>
+        <div class="totalmoney">
+          <div class="total-money">
+            <span>合计</span>
+            <span class="totalmoney-money">￥{{allInfo.countMoney}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="order">
+        <div class="tab-bar">
+          <div class="tab active">订单信息</div>
+        </div>
+        <div class="info-list">
+          <div class="info-key">订单号码</div>
+          <div class="info-value">{{allInfo.oderNumber}}</div>
+        </div>
+        <div class="info-list">
+          <div class="info-key">下单时间</div>
+          <div class="info-value">{{allInfo.createTime}}</div>
+        </div>
+        <div class="info-list">
+          <div class="info-key">支付方式</div>
+          <div class="info-value">在线支付</div>
+        </div>
+        <div class="info-list">
+          <div class="info-key">商家电话</div>
+          <div class="info-value">{{allInfo.phone}}</div>
+        </div>
+      </div>
+      <div class="confirm-buy">
+        <div class="all-price">
+          <div class="price">￥{{allInfo.countMoney}}</div>
+          <div class="price-text">合计总价</div>
+        </div>
+        <div class="confirm-btn" @click="payTicket">
+          支付订单
+        </div>
+      </div>
+    </div>
+</body>
+<script>
+  $(function () {
+    let that
+    let Id = getParam('id')
+    var vm = new Vue({
+      el: ".container",
+      data() {
+        return {
+          shopList: [],
+          foodList: [],
+          tabList: [{
+            name: '联系人'
+          }],
+          currentIndex: 0,
+          ticketNumber: 1,
+          allInfo: {},
+          imageUrl: apiUrl
+        }
+      },
+      mounted () {
+        that = this
+        this.getInfo()
+      },
+      methods: {
+        changeTab(item, index) {
+          this.currentIndex = index
+        },
+        // 支付订单 调起支付接口
+        payTicket () {
+          const data = {
+            oderId: Id,
+            type: 'SHOP'
+          }
+          Ajax({
+            type: 'post',
+            url: apiUrl + '/pay/createOrder/js',
+            // contentType: "application/json;charset=UTF-8",
+            data: data,
+            success: function (res) {
+              if (res.state == _OK) {
+                if (typeof WeixinJSBridge != "undefined") {// $.alert('这是微信浏览器') //eslint-disable-line no-undef, angular/module-getter, angular/di
+                  function onBridgeReady(){
+                    WeixinJSBridge.invoke(
+                      'getBrandWCPayRequest', {
+                        "appId":"wx2421b1c4370ec43b",     //公众号名称，由商户传入     
+                        "timeStamp":"1395712654",         //时间戳，自1970年以来的秒数     
+                        "nonceStr":"e61463f8efa94090b1f366cccfbbb444", //随机串     
+                        "package":"prepay_id=u802345jgfjsdfgsdg888",     
+                        "signType":"MD5",         //微信签名方式：     
+                        "paySign":"70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名 
+                      },
+                      function(res){
+                      if(res.err_msg == "get_brand_wcpay_request:ok" ){
+                        // 使用以上方式判断前端返回,微信团队郑重提示：
+                        //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                        location.href = './storeOrderDetail.html?id='+Id
+                      } 
+                    }); 
+                  }
+                  onBridgeReady()
+                } else {
+                  $.alert('请使用微信浏览器进行支付')
+                }
+                // res = res.data
+                // console.log(res)
+              } else if (res.state == NoLogin) {
+                $.alert(res.message)
+                  setTimeout(()=> {
+                    location.href = "./login.html"
+                  },1000)
+              } else {
+                $.alert(res.message)
+              }
+            }
+          })
+        },
+        getInfo () {
+          Ajax({
+            type: 'get',
+            url: apiUrl + '/shopOder/findOne?id='+Id,
+            contentType: "application/json;charset=UTF-8",
+            success: function (res) {
+              if (res.state == _OK) {
+                res = res.data
+                console.log(res)
+                that.allInfo = res
+                that.foodList = res.oderGoods
+              } else if (res.state == NoLogin) {
+                $.alert(res.message)
+                  setTimeout(()=> {
+                    location.href = "./login.html"
+                  },1000)
+              } else {
+                $.alert(res.message)
+              }
+            }
+          })
+        }
+      }
+    })
+  })
+</script>
+<style>
+  .container {
+    width: 100%;
+    height: calc(100% - 1.2rem);
+    background: #F5F4F4;
+    overflow-y: auto;
+    color: #4d4d4d;
+    box-sizing: border-box;
+    /* padding-bottom: 1.2rem; */
+    padding: 0.2rem 0.2rem 0 0.2rem;
+    margin-bottom: 1.2rem;
+  }
+  .store {
+    width: 100%;
+    background: white;
+    margin-bottom: 0.2rem;
+  }
+  .store-name {
+    width: 100%;
+    height: 1rem;
+    box-sizing: border-box;
+    padding: 0 0.2rem;
+    line-height:1rem;
+    font-size: 0.32rem;
+    font-weight: bold;
+    border-bottom: 0.01rem #F5F4F4 solid;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .food-list {
+    width: 100%;
+    border-bottom: 0.01rem #F5F4F4 solid;
+  }
+  .food {
+    width: 100%;
+    height: 1.3rem;
+    box-sizing: border-box;
+    padding: 0.25rem 0.25rem;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .food-img {
+    position: relative;
+    width: 0.8rem;
+    height: 100%;
+  }
+  .food-img img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  .food-info {
+    height: 100%;
+    margin-left: 0.2rem;
+    font-size: 0.24rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+  }
+  .food-name {
+    font-weight: bold;
+  }
+  .food-num {
+    color: #bbbbbb;
+  }
+  .food-price {
+    margin-left: auto;
+    font-size: 0.24rem;
+    line-height: 1.3rem;
+  }
+  .totalmoney {
+    width: 100%;
+    height: 1rem;
+    display: flex;
+    background: white;
+    align-items: center;
+    -webkit-align-items: center;
+    font-size: 0.24rem;
+    box-sizing: border-box;
+    padding: 0 0.25rem;
+  }
+  .total-money {
+    margin-left: auto;
+  }
+  .totalmoney-money {
+    font-size: 0.34rem;
+  }
+  .ticket-info {
+    width: 100%;
+    background: white;
+    box-sizing: border-box;
+    margin-bottom: 0.3rem;
+  }
+  .ticket-top {
+    border-bottom: 0.01rem #F5F4F4 solid;
+  }
+  .ticket-title {
+    width: 100%;
+    height: 1rem;
+    line-height: 1rem;
+    letter-spacing: 0.01rem;
+    font-size: 0.32rem;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .info-list {
+    width: 100%;
+    height: 1rem;
+    /* line-height: 1rem; */
+    font-size: 0.28rem;
+    display: flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+    box-sizing: border-box;
+    padding: 0 0.3rem;
+    background: white;
+  }
+  .info-key {
+    color: #9D9D9D;
+    width: 1.5rem;
+  }
+  .info-value {
+    width: calc(100% - 1.5rem);
+    text-align: right;
+  }
+  .tab-bar {
+    height: 1rem;
+    background: white;
+    z-index: 2;
+    border-bottom: 0.01rem #F5F4F4 solid;
+    display: flex;
+  }
+  .tab {
+    height: 100%;
+    line-height: 1rem;
+    text-align: center;
+    color: #9C9C9C;
+    font-size: 0.24rem;
+    padding: 0 0.3rem;
+  }
+
+  .tab.active {
+    color: #707070;
+    font-size: 0.32rem;
+    font-weight: bold;
+  }
+
+  .tab.active::after {
+    content: '';
+    display: block;
+    width: 0.6rem;
+    height: 0.06rem;
+    background: #4D78EF;
+    margin: -0.06rem 0 0 calc(50% - 0.3rem);
+  }
+  .confirm-buy {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1.2rem;
+    background: white;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+  }
+
+  .all-price {
+    margin-left: 0.3rem;
+  }
+
+  .price {
+    font-size: 0.34rem;
+    font-weight: bold;
+    color: #F14646;
+  }
+
+  .price-text {
+    font-size: 0.16rem;
+  }
+
+  .confirm-btn {
+    width: 1.76rem;
+    height: 100%;
+    line-height: 1.2rem;
+    text-align: center;
+    color: white;
+    font-size: 0.28rem;
+    font-weight: bold;
+    background: #4D78EF;
+  }
+</style>
+
+</html>
