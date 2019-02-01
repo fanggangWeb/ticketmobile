@@ -134,7 +134,8 @@
           }
           const data = {
             oderId: item.id,
-            type: payType
+            type: payType,
+            spread: localStorage.getItem('spread')
           }
           Ajax({
             type: 'post',

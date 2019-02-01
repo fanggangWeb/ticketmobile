@@ -114,7 +114,8 @@
         payTicket() {
           const data = {
             oderId: Id,
-            type: 'TICKETING'
+            type: 'TICKETING',
+            spread: localStorage.getItem('spread')
           }
           Ajax({
             type: 'post',

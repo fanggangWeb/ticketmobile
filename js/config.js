@@ -1,5 +1,5 @@
 let apiUrl = 'http://192.168.0.90:8080'
-// let apiUrl = '39.104.98.18:8080'
+// let apiUrl = 'http://39.104.98.18:8080'
 // 解析url传参
 var getParam = function (name) {
   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
@@ -9,6 +9,11 @@ var getParam = function (name) {
 }
 var removerOpenId = function () {
   sessionStorage.removeItem("openid")
+}
+// 全局登陆
+var spread = getParam('spread')
+if (spread) {
+  localStorage.setItem('spread', spread)
 }
 var URL = window.location.pathname;
 URL = URL.substring(URL.lastIndexOf('/') + 1, URL.length)
@@ -51,11 +56,7 @@ function Ajax(options) {
   return $.ajax(options)
 
 }
-// 全局登陆
-if (spread) {
-  var spread = getParam('spread')
-  localStorage.setItem('spread', spread)
-}
+
 var WXLOGIN = function () {
   // let redirectUrl = window.location.href
   let  redirectUrl = encodeURIComponent('http://x21157b861.iok.la/ticketmobile/login.html')
@@ -153,6 +154,12 @@ const filterHtml = function (description) {
   description = description.replace(/(\r)/g, "");
   description = description.replace(/<\/?[^>]*>/g, "");
   description = description.replace(/\s*/g, "");
+  description = description.replace(/&amp;/g,"&");
+  description = description.replace(/&lt;/g,"<");
+  description = description.replace(/&gt;/g,">");
+  description = description.replace(/&nbsp;/g," ");
+  description = description.replace(/&#39;/g,"\'");
+  description = description.replace(/&quot;/g,"\"");
   return description
 }
 // 校验手机号

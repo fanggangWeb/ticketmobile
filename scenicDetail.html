@@ -93,11 +93,11 @@
       </div>
       <div class="notice-content">
         <div class="notice-title">开放时间</div>
-        <div class="notice-text">{{allInfo.openTime}}</div>
+        <div class="notice-text">{{allInfo.openTime | filterHtml}}</div>
         <div class="notice-title">优惠政策</div>
-        <div class="notice-text">{{allInfo.policy}}</div>
+        <div class="notice-text">{{allInfo.policy | filterHtml}}</div>
         <div class="notice-title">温馨提示</div>
-        <div class="notice-text">{{allInfo.tips}}</div>
+        <div class="notice-text">{{allInfo.tips | filterHtml}}</div>
       </div>
     </div>
   </div>

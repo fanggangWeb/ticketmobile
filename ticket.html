@@ -90,11 +90,11 @@
         <div class="pop-title">购买须知</div>
         <div class="notice-content">
           <div class="notice-title">开放时间</div>
-          <div class="notice-desc">{{notice.openTime}}</div>
+          <div class="notice-desc">{{notice.openTime | filterHtml}}</div>
           <div class="notice-title">优惠政策</div>
-          <div class="notice-desc">{{notice.policy}}</div>
+          <div class="notice-desc">{{notice.policy | filterHtml}}</div>
           <div class="notice-title">温馨提示</div>
-          <div class="notice-desc">{{notice.tips}}</div>
+          <div class="notice-desc">{{notice.tips | filterHtml}}</div>
         </div>
         <div class="close-btn" @click="popupState=false">关闭</div>
       </div>
@@ -125,6 +125,9 @@
           singlePrice: 0,
           money: 0
         }
+      },
+      filters: {
+        filterHtml: filterHtml
       },
       mounted () {
         that = this
@@ -482,8 +485,10 @@
 
   .notice-content {
     width: 100%;
+    max-height: 80%;
     box-sizing: border-box;
     padding: 0.26rem;
+    overflow-y:auto; 
   }
 
   .notice-title {
