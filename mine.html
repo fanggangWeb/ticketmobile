@@ -26,7 +26,7 @@
   <div class="container">
     <div class="my-info">
       <div class="avatar">
-        <img src="./img/index/store.png" alt="">
+        <img :src="avatar" alt="">
       </div>
       <div class="nickname">{{userInfo.username}}</div>
     </div>
@@ -62,8 +62,12 @@
       data() {
         return {
           userInfo: userInfo,
-          menuList: [{name: '消费记录', go: 'profit.html'}]
+          menuList: [{name: '消费记录', go: 'profit.html'}],
+          avatar: ''
         }
+      },
+      mounted () {
+        this.avatar = sessionStorage.getItem('profileUrl')
       },
       methods: {
         changeTab (item, index) {

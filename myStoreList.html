@@ -44,7 +44,7 @@
             </div>
             <div class="item-right">
               <div class="item-title">{{one.name}}</div>
-              <div class="item-desc">{{one.describe}}</div>
+              <div class="item-desc">{{one.describe| filterHtml}}</div>
               <div class="item-bottom">
                 <div class="item-tag">{{one.regionName}}|{{one.typeName}}</div>
                 <div class="item-score">{{one.score}}分</div>
@@ -77,6 +77,9 @@
         that = this
         this.init()
         this.getStoreList()
+      },
+      filters: {
+        filterHtml: filterHtml
       },
       methods: {
         changeTab (item, index) {
@@ -117,6 +120,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -145,6 +149,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {

@@ -40,11 +40,11 @@
           </div>
           <div class="list-item" @click="goDetail(one)" v-for="(one,index) in storeList" :key="index">
             <div class="item-left">
-              <img :src="imageUrl+one.file.url" alt="">
+              <img v-if="one.file" :src="imageUrl+one.file.url" alt="">
             </div>
             <div class="item-right">
               <div class="item-title">{{one.name}}</div>
-              <div class="item-desc">{{one.describe}}</div>
+              <div class="item-desc">{{one.describe | filterHtml}}</div>
               <div class="item-bottom">
                 <div class="item-tag">{{one.regionName}}|{{one.typeName}}</div>
                 <div class="item-score">{{one.score}}分</div>
@@ -73,6 +73,9 @@
           imageUrl: apiUrl,
           storeList: []
         }
+      },
+      filters: {
+        filterHtml: filterHtml
       },
       mounted () {
         that = this
@@ -119,6 +122,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -148,6 +152,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {

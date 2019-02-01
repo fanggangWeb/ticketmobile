@@ -79,10 +79,24 @@
           }
         },
         login () {
+          if (this.phoneNumber == '') {
+            $.alert('请输入手机号')
+            return false
+          }
+          if(!(/^1[34578]\d{9}$/.test(this.phoneNumber))){ 
+            $.alert("请输入格式正确的手机号");  
+            return false
+          }
+          if (this.smsCode == '') {
+            $.alert('请输入验证码')
+            return false
+          }
+          // 第一步手机登陆 http://x21157b861.iok.la/auth/weixin
           let data = {
             mobile: this.phoneNumber,
             smsCode: this.smsCode
           }
+          // alert(111)
           Ajax({
             type: 'post',
             url: apiUrl + '/authentication/mobile',
@@ -90,21 +104,26 @@
             data: data,
             success: function (res) {
               if (res.state == _OK) {
+                // alert(JSON.stringify(res))
                 res = res.data
                 localStorage.setItem('userInfo',JSON.stringify(res))
-                location.href = "./index.html"
-              } else if (res.state == NoLogin) {
-                $.alert(res.message)
-                setTimeout(()=> {
-                  location.href = "./login.html"
-                },1000)
+                location.href="./index.html"
               } else {
                 $.alert(res.message)
+                // alert(JSON.stringify(res.message))
               }
             }
-          })  
+          })
         },    
         sendCode () {
+          if (this.phoneNumber == '') {
+            $.alert('请输入手机号')
+            return false
+          }
+          if(!(/^1[34578]\d{9}$/.test(this.phoneNumber))){ 
+            $.alert("输入的手机号码有误，重新输入");  
+            return false;
+          }
           if (this.codeState == 1) {
             const data = {
               mobile: this.phoneNumber
@@ -115,7 +134,13 @@
               url: apiUrl + '/code/sms',
               // contentType: "application/json;charset=UTF-8",
               data: data,
-              success: function (res) {}
+              success: function (res) {
+                if (res.state == _OK) {
+                  return
+                } else {
+                  $.alert(res.message)
+                }
+              }
             }) 
           }
         }

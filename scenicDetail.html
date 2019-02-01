@@ -39,12 +39,12 @@
       </div>
       <div class="scenic-name">{{allInfo.name}}</div>
       <div class="scenic-desc">
-        {{allInfo.describes}}
+        {{allInfo.describes | filterHtml}}
       </div>
       <div class="scenic-position">
         <div class="scenic-icon"></div>
         <div class="scenic-address">{{allInfo.address}}</div>
-        <div class="scenic-arrow">></div>
+        <div class="scenic-arrow"></div>
       </div>
     </div>
     <div class="tab-bar">
@@ -121,6 +121,9 @@
           ticketList: []
         }
       },
+      filters: {
+        filterHtml: filterHtml
+      },
       mounted () {
         that = this
         this.getDetail()
@@ -163,6 +166,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -247,7 +251,7 @@
     width: 100%;
     color: #9d9d9d;
     max-height: 1.08rem;
-    padding-bottom: 0.2rem;
+    /* padding-bottom: 0.2rem; */
     border-bottom: 1px solid #F5F4F4;
     line-height: 0.36rem;
     letter-spacing: 0.01rem;
@@ -322,7 +326,7 @@
   }
   .list-item {
     width: 100%;
-    height: 1.8rem;
+    min-height: 1.8rem;
     background: white;
     box-sizing: border-box;
     padding: 0.26rem;
@@ -331,7 +335,7 @@
     border-bottom: 0.02rem #F5F4F4 solid;
   }
   .item-left {
-    width: 5.5rem;
+    width: 5rem;
     height: 100%;
   }
   .item-name {
@@ -369,7 +373,7 @@
   .item-tags {
     margin-top: 0.1rem;
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
   .tag {
     box-sizing: border-box;
@@ -379,6 +383,7 @@
     margin-right: 0.15rem;
     font-size: 0.16rem;
     border: 0.01rem solid #ccc;
+    margin-bottom: 0.1rem;
   }
   .tag.yellow {
     color: #E78E00;
@@ -393,8 +398,9 @@
     border: 0.01rem solid #B8B8B8;
   }
   .item-right {
-    width: calc(100% - 5.5rem);
-    height: 100%;
+    width: calc(100% - 5rem);
+    display: flex;
+    flex-wrap: wrap;
   }
   .item-price {
     color: #888888;
@@ -414,6 +420,7 @@
     letter-spacing: 0.01rem;
     color: white;
     background: linear-gradient(to right, #6C8DE8, #979AFF 100%);
+    margin-top: auto;
   }
   .nodata {
     height: 0.8rem;

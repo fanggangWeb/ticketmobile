@@ -53,7 +53,7 @@
             <div class="list-top">
               <div class="item-info">
                 <div class="info-img">
-                  <img src="./img/index/store.png" alt="">
+                  <img v-if="one.file" :src="imageUrl+one.file.url" alt="">
                 </div>
                 <div class="info-text">
                   <div class="text-title">{{one.name}}</div>
@@ -66,8 +66,9 @@
                 <div class="state-money">￥{{one.countMoney}}</div>
               </div>
             </div>
-            <div class="list-bottom" v-if="one.status!='SUCCESS'">
-              <div class="pay-btn" @click.stop="payTicket(one)">立即支付</div>
+            <div class="list-bottom">
+              <div class="del-btn" @click.stop="delOrder(one)">删除订单</div> 
+              <div class="pay-btn"  v-if="one.status!='SUCCESS'" @click.stop="payTicket(one)">立即支付</div>
             </div>
           </div>
           <div class="more-btn" v-if="moreShow" @click="getMoreOrder">加载更多</div>
@@ -106,6 +107,7 @@
           typeVal: '',
           page: 1,
           size: 10,
+          imageUrl: apiUrl,
           nodataState: false,
           moreShow: false,
           orderList: [],
@@ -139,18 +141,19 @@
             url: apiUrl + '/pay/createOrder/js',
             // contentType: "application/json;charset=UTF-8",
             data: data,
-            success: function (res) {
-              if (res.state == _OK) {
+            success: function (rs) {
+              if (rs.state == _OK) {
+                rs= rs.data
                 if (typeof WeixinJSBridge != "undefined") {// $.alert('这是微信浏览器') //eslint-disable-line no-undef, angular/module-getter, angular/di
                   function onBridgeReady(){
                     WeixinJSBridge.invoke(
-                        'getBrandWCPayRequest', {
-                          "appId":"wx2421b1c4370ec43b",     //公众号名称，由商户传入     
-                          "timeStamp":"1395712654",         //时间戳，自1970年以来的秒数     
-                          "nonceStr":"e61463f8efa94090b1f366cccfbbb444", //随机串     
-                          "package":"prepay_id=u802345jgfjsdfgsdg888",     
-                          "signType":"MD5",         //微信签名方式：     
-                          "paySign":"70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名 
+                      'getBrandWCPayRequest', {
+                        "appId": rs.appId, //公众号名称，由商户传入     
+                        "timeStamp": rs.timeStamp, //时间戳，自1970年以来的秒数     
+                        "nonceStr": rs.nonceStr, //随机串     
+                        "package": rs.packageValue,
+                        "signType": rs.signType, //微信签名方式：     
+                        "paySign": rs.paySign //微信签名 
                         },
                         function(res){
                         if(res.err_msg == "get_brand_wcpay_request:ok" ){
@@ -173,6 +176,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -189,6 +193,57 @@
             this.getScenicOrder()
           } else { // 店铺订单
             this.getStoreOrder()
+          }
+        },
+        delOrder (item) {
+          const data = {
+              id: item.id
+            }  
+          if (this.typeIndex == 0) { //门票订单删除
+            Ajax({
+              type: 'post',
+              url: apiUrl + '/scenicSpotOder/getById',
+              // contentType: "application/json;charset=UTF-8",
+              data: data,
+              success: function (res) {
+                if (res.state == _OK) {
+                  $.alert('删除订单成功')
+                  that.page = 1
+                  that.getScenicOrder()
+                } else if (res.state == NoLogin) {
+                  $.alert(res.message)
+                    setTimeout(()=> {
+                      removerOpenId()
+                      location.href = "./login.html"
+                    },1000)
+                } else {
+                  $.alert(res.message)
+                }
+              }
+            })
+          } else {
+            Ajax({
+              type: 'post',
+              url: apiUrl + '/shopOder/getById',
+              // contentType: "application/json;charset=UTF-8",
+              data: data,
+              success: function (res) {
+                if (res.state == _OK) {
+                  $.alert('删除订单成功')
+                  that.page = 1
+                  that.getStoreOrder()
+                } else if (res.state == NoLogin) {
+                  $.alert(res.message)
+                    setTimeout(()=> {
+                      removerOpenId()
+                      location.href = "./login.html"
+                    },1000)
+                } else {
+                  $.alert(res.message)
+                }
+              }
+            })
+
           }
         },
         orderGo (one) {
@@ -208,8 +263,8 @@
         },
         goMine () {
           let userInfo = localStorage.getItem('userInfo')
-          let authoritiy =  JSON.parse(userInfo).authorities[0].authoritiy
-          
+          let authoritiy =  JSON.parse(userInfo).authorities[0].authority
+          console.log(authoritiy)
           if (authoritiy == 'ORDINARY') {
             location.href = "./mine.html"
           } else {
@@ -262,6 +317,7 @@
                 } else if (res.state == NoLogin) {
                   $.alert(res.message)
                     setTimeout(()=> {
+                      removerOpenId()
                       location.href = "./login.html"
                     },1000)
                 } else {
@@ -289,6 +345,7 @@
                 } else if (res.state == NoLogin) {
                   $.alert(res.message)
                     setTimeout(()=> {
+                      removerOpenId()
                       location.href = "./login.html"
                     },1000)
                 } else {
@@ -319,6 +376,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -349,6 +407,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -586,6 +645,18 @@
     font-size: 0.2rem;
     color: #4D78EF;
     border: 1px solid #4D78EF;
+    border-radius: 0.1rem;
+    margin-left: 0.2rem;
+  }
+  .del-btn {
+    width: 1.25rem;
+    height: 0.54rem;
+    line-height: 0.54rem;
+    text-align: center;
+    margin-left: auto;
+    font-size: 0.2rem;
+    color: #F32E2E;
+    border: 1px solid #F32E2E;
     border-radius: 0.1rem;
   }
   .nodata {

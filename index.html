@@ -27,8 +27,8 @@
     <div id="banner">
       <div class="swiper-container">
         <div class="swiper-wrapper">
-          <div class="swiper-slide" v-for="(item, index) in bannerList" :key="index">
-            <img :src="imageUrl+item.file.url" alt="">
+          <div class="swiper-slide" v-for="(one, index) in bannerList" :key="index">
+            <img v-if="one.file.url!=null" :src="imageUrl+one.file.url" alt="">
           </div>
           <!-- <div class="swiper-slide">
             <img src="./img/index/banner.png" alt="">
@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="shop-container">
-      <div class="shop-left scenic-left" @click="go('./secnicList.html')">
+      <div class="shop-left scenic-left" @click="go('./scenicList.html')">
         <div class="shop-text">门票/景点</div>
       </div>
       <div class="shop-right">
@@ -157,8 +157,8 @@
         },
         goMine () {
           let userInfo = localStorage.getItem('userInfo')
-          let authoritiy =  JSON.parse(userInfo).authorities[0].authoritiy
-          
+          let authoritiy =  JSON.parse(userInfo).authorities[0].authority
+          console.log(authoritiy)
           if (authoritiy == 'ORDINARY') {
             location.href = "./mine.html"
           } else {
@@ -166,7 +166,7 @@
           }
         },
         goScenic (item) {
-          location.href = './secnicList.html?typeId='+item.id
+          location.href = './scenicList.html?typeId='+item.id
         },
         goStore (item) {
           location.href = './storeList.html?typeId='+item.id
@@ -207,6 +207,7 @@
                 } else if (res.state == NoLogin) {
                   $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
                 } else {
@@ -233,6 +234,7 @@
                 } else if (res.state ==NoLogin) {
                   $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
                 } else {
@@ -262,6 +264,7 @@
               } else if (res.state == NoLogin|| res.state == 400) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -284,10 +287,12 @@
             success: function (res) {
               if (res.state == _OK) {
                 res = res.data
-                this.bannerList = res.rows
+                that.bannerList = res.rows
+                console.log(that.bannerList)
               } else if (res.state ==NoLogin|| res.state == 400) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -317,6 +322,7 @@
                 } else if (res.state ==NoLogin|| res.state == 400) {
                   $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
                 } else {

@@ -46,7 +46,7 @@
       el: ".container",
       data() {
         return {
-          number: 0.2
+          number: 0
         }
       },
       mounted () {
@@ -71,6 +71,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {

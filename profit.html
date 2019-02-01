@@ -153,6 +153,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -185,6 +186,7 @@
                 $.alert(res.message)
                   setTimeout(()=> {
                     location.href = "./login.html"
+                    removerOpenId()
                   },1000)
               } else {
                 $.alert(res.message)

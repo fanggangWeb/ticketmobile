@@ -16,8 +16,9 @@
   <script src="lib/jquery-3.3.1.js"></script>
   <script src="lib/swiper.4.4.2.min.js"></script>
   <script src="lib/vue.js"></script>
-  <script src="js/config.js"></script>
   <script src="lib/jquery-weui.1.2.1.min.js"></script>
+  <script src="js/config.js"></script>
+  <!-- <script src="lib/numeral.min.js"></script> -->
   <!-- 公用组件库结束 -->
   <script src="js/index.js"></script>
   <title>店铺详情</title>
@@ -32,7 +33,7 @@
       <div class="top-right">
         <div class="scenic-name">{{allInfo.name}}</div>
         <div class="scenic-desc">
-          {{allInfo.introduction}}
+          {{allInfo.introduction| filterHtml}}
         </div>
       </div>
     </div>
@@ -79,7 +80,7 @@
             </div>
             <div class="item-right">
               <div class="item-title">{{item.name}}</div>
-              <div class="item-desc">{{item.introduces}}</div>
+              <div class="item-desc">{{item.introduces | filterHtml}}</div>
               <div class="item-bottom">
                 <div class="item-price"><span class="price">￥{{item.price}}</span>起</div>
                 <div class="item-choose">
@@ -132,11 +133,11 @@
         <div class="cart-num">{{allNum}}</div>
       </div>
       <div class="all-price">
-        <div class="price">￥{{allPrice}}</div>
+        <div class="price">￥{{allPrice.toFixed(2)}}</div>
         <div class="price-text">合计总价</div>
       </div>
       <div class="confirm-btn" @click="submitOrder">
-        支付订单
+        提交订单
       </div>
     </div>
   </div>
@@ -168,6 +169,9 @@
           oneDesc: ''
         }
       },
+      filters: {
+        filterHtml: filterHtml
+      },
       mounted() {
         that = this
         this.getDetail()
@@ -175,7 +179,7 @@
       methods: {
         showDetail (item) {
           this.oneImg = this.imageUrl + item.file.url
-          this.oneDesc = item.introduces
+          this.oneDesc = item.introduction
           this.oneName = item.name
           this.onePrice = item.price
           this.detailShow = true
@@ -202,7 +206,8 @@
               } else if (res.state ==NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
-                    // location.href = "./login.html"
+                    removerOpenId()
+                    location.href = "./login.html"
                   },1000)
               } else {
                 $.alert(res.message)
@@ -235,6 +240,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
+                    removerOpenId()
                     location.href = "./login.html"
                   },1000)
               } else {
@@ -311,7 +317,7 @@
           let num = 0, price = 0
           this.cartList.forEach((e) => {
             num = e.num + num
-            price = e.price*e.num + price
+            price = accAdd(accMul(e.price,e.num),price)
           })
           this.allNum = num
           this.allPrice = price

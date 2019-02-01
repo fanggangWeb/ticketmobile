@@ -18,6 +18,7 @@
   <script src="lib/vue.js"></script>
   <script src="js/config.js"></script>
   <script src="lib/jquery-weui.1.2.1.min.js"></script>
+  <script src="lib/numeral.min.js"></script>
   <!-- 公用组件库结束 -->
   <title>景区购票</title>
 </head>
@@ -29,9 +30,11 @@
         <div class="ticket-top">
           <div class="ticket-title">{{allInfo.name}}</div>
           <div class="ticket-tag">
-            <div class="tags" v-for="(item, index) in allInfo.ticketTypes" :key="item.id">
-              <div class="tag-icon"></div>
-              <div class="tag-text">{{item.name}}</div>
+            <div class="tags-con">
+              <div class="tags" v-for="(item, index) in allInfo.ticketTypes" :key="item.id">
+                <div class="tag-icon"></div>
+                <div class="tag-text">{{item.name}}</div>
+              </div>
             </div>
             <div class="notice" @click="popupState = true">
               <div class="notice-text">购买须知</div>
@@ -62,7 +65,7 @@
         <div class="weui-cell">
           <div class="weui-cell__hd"><label class="weui-label">游客名</label></div>
           <div class="weui-cell__bd">
-            <input class="weui-input" v-model="contact" placeholder="请填写姓名">
+            <input class="weui-input" v-model="contact" placeholder="请填写姓名,限2-5个中文字符">
           </div>
         </div>
         <div class="weui-cell">
@@ -103,6 +106,7 @@
     let scenicInfo = JSON.parse(sessionStorage.getItem('scenicInfo'))
     let mustknow = JSON.parse(sessionStorage.getItem('mustknow'))
     let that
+    let today = new Date()
     var vm = new Vue({
       el: ".all",
       data() {
@@ -132,7 +136,7 @@
           this.currentIndex = index
         },
         getAllMoney () {
-          this.money = this.singlePrice * this.ticketNumber
+          this.money = accMul(this.singlePrice,this.ticketNumber)
         },
         minus() {
           if (this.ticketNumber <= 1) {
@@ -148,6 +152,7 @@
         },
         orderSumbit () {
           var date = new Date($("#dateChoose").val())
+          console.log(date)
           if (!that.allInfo.id) {
             $.alert('未找到门票信息')
             return false
@@ -159,7 +164,11 @@
             $.alert('请填写联系人姓名')
             return false
           }else if (this.phoneNumber == '') {
-            $.alert('请填写联系人电话')
+            $.alert('请填写手机号')
+            return false
+          }
+          if(!(/^1[34578]\d{9}$/.test(this.phoneNumber))){ 
+            $.alert("请输入格式正确的手机号");  
             return false
           }
           date = Date.parse(date)
@@ -183,6 +192,7 @@
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                 setTimeout(()=> {
+                  removerOpenId()
                   location.href = "./login.html"
                 },1000)
               } else {
@@ -193,7 +203,10 @@
         }
       }
     })
-    $("#dateChoose").calendar();
+    $("#dateChoose").calendar({
+      title: '请选择生日',
+      minDate: today//只限制最大可以这样写'1970-07-07 &nbsp;'
+    });
     // $(".list").pullToRefresh().on("pull-to-refresh", function () {
     //   setTimeout(function () {
     //     // $(".list-content").html("");
@@ -241,7 +254,7 @@
   }
 
   .ticket-tag {
-    height: 0.4rem;
+    min-height: 0.4rem;
     display: flex;
     flex-wrap: nowrap;
     font-size: 0.2rem;
@@ -251,13 +264,18 @@
     margin-top: 0.2rem;
     margin-bottom: 0.3rem;
   }
-
+  .tags-con {
+    width: 5rem;
+    display: flex;
+    flex-wrap: wrap;
+  }
   .tags {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
     -webkit-align-items: center;
     margin-right: 0.2rem;
+    margin-bottom: 0.1rem;
   }
 
   .tags:last-child {
