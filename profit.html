@@ -22,8 +22,8 @@
   <title>我的收益</title>
 </head>
 
-<body>
-  <div class="container">
+<body ontouchstart>
+  <div class="container" v-cloak>
     <div class="tab-bar">
       <div class="tab" :class="{active:index == currentIndex}" v-for="(item, index) in tabList" @click="changeTab(item,index)" :key="index" >
         {{item.name}}
@@ -149,7 +149,7 @@
                 that.orderList = that.orderList.concat(res.rows)
                 that.total = res.total
                 that.judgeList(res)
-                that.getAllMoney() 
+                //that.getAllMoney()
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {
@@ -181,7 +181,8 @@
                 that.orderList = res.rows
                 that.total = res.total
                 that.judgeList(res)
-                that.getAllMoney() 
+                //that.getAllMoney()
+                that.allMoney=res.money 
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
                   setTimeout(()=> {

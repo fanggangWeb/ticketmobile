@@ -4,6 +4,9 @@ html, body {
   height: 100%;
   font-family:Microsoft YaHei !important;
 }
+[v-cloak]{
+  display:none
+}
 @media (min-width: 560px) {
   html {
     font-size: 54px;

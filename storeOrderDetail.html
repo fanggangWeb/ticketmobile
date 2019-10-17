@@ -22,8 +22,8 @@
   <title>订单详情</title>
 </head>
 
-<body>
-  <div class="container">
+<body ontouchstart>
+  <div class="container" v-cloak>
     <div class="top">
       <div class="top-img">
         <img src="./img/index/store.png" alt="">
@@ -47,7 +47,7 @@
         <span class="center-text">订单号：</span>
         <span class="center-num">{{allInfo.oderNumber}}</span>
       </div>
-      <div class="warning" style="color:red;font-size: 0.28rem;">请妥善保管好二维码,勿让非工作人员扫描</div>
+      <div class="warning" style="color:red;font-size: 0.28rem;">请妥善保管好二维码，勿让非工作人员扫描（可长按图片保存至本地）</div>
     </div>
     <div class="commodity">
       <div class="commodity-title">商品列表</div>
@@ -209,7 +209,7 @@
     height: 110%;
   }
   .center {
-    height: 4.5rem;
+    height: 6rem;
     background: #edeff1;
     display: flex;
     flex-wrap: wrap;
@@ -218,6 +218,8 @@
     align-items: center;
     -webkit-align-items: center;
     border-bottom: 0.02rem dotted #bdbdbd;
+    box-sizing: border-box;
+    padding: 0 0.4rem;
   }
   .qrcode {
     width: 2.6rem;

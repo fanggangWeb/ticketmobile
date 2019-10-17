@@ -17,13 +17,14 @@
   <script src="lib/swiper.4.4.2.min.js"></script>
   <script src="lib/vue.js"></script>
   <script src="js/config.js"></script>
+  <script ></script>
   <script src="lib/jquery-weui.1.2.1.min.js"></script>
   <!-- 公用组件库结束 -->
-  <title>提现</title>
+  <title>付款</title>
 </head>
 
-<body>
-  <div class="container">
+<body ontouchstart>
+  <div class="container" v-cloak>
     <div class="top-bg"></div>
     <div class="top">
       <div class="top-left">
@@ -31,7 +32,7 @@
         <div class="shop-name">{{allInfo.name}}</div>
       </div>
       <div class="top-right">
-        <img :src="imageUrl+allInfo.file.url" alt="">
+        <img :src="imageUrl+allInfo.headUrl" alt="">
       </div>
     </div>
     <div class="withdraw">
@@ -40,20 +41,30 @@
         <div class="weui-cell">
           <div class="weui-cell__hd"><label class="weui-label">￥</label></div>
           <div class="weui-cell__bd">
-            <input class="weui-input" v-model="withdrawNumber"  type="number" pattern="[0-9]*" placeholder="输入付款金额">
+            <input class="weui-input" v-model="withdrawNumber" type="text" placeholder="输入付款金额">
           </div>
         </div>
       </div>
     </div>
     <div class="bottom">
-      <div class="confirm-btn">付款</div>
+      <div class="confirm-btn" @click="toPay">付款</div>
     </div>
   </div>
 </body>
 <script>
+  var id = getParam('id')
+  var type = getParam('type')
+  if(id != '' && id != null && id != undefined) {
+    sessionStorage.setItem('localId', id)
+  }
+  if(type != '' && type != null && type != undefined) {
+    sessionStorage.setItem('localType',type)
+  }
   $(function () {
     let that
-    let Id = getParam('id')
+    let openid = sessionStorage.getItem('openid')
+    let localId = sessionStorage.getItem('localId')
+    let localType =  sessionStorage.getItem('localType')
     var vm = new Vue({
       el: ".container",
       data() {
@@ -63,24 +74,140 @@
           withdrawNumber: '',
           imageUrl: apiUrl,
           allInfo: {
-            file:{}
+            headUrl: '',
+            name: ''
           }
         }
       },
-      mounted () {
+      mounted() {
         that = this
+        this.PAYLOGIN()
         this.getShopInfo()
       },
       methods: {
-        takeAll () {
+        takeAll() {
           this.withdrawNumber = this.lastNumber
         },
-        getShopInfo () {
+        toPay () {
+          if (isNaN(this.withdrawNumber)) {
+            $.alert('请输入数字')
+            return false
+          } else if (this.withdrawNumber<= 0) {
+            $.alert('请填写有效金额')
+            return false
+          }
+          const data = {
+            id: localId,
+            type: localType, 
+            openid: openid,  
+            countMoney:  this.withdrawNumber,
+            spread: localStorage.getItem('spread')
+          }
           Ajax({
-            type: 'get',
-            url: apiUrl + '/userInfo/myWallet?id='+Id,
+            type: 'post',
+            url: apiUrl + '/pay/createOrder/js/under',
             // contentType: "application/json;charset=UTF-8",
-            // data: data,
+            data: data,
+            success: function (rs) {
+              if (rs.state == _OK) {
+                rs = rs.data
+                if (typeof WeixinJSBridge != "undefined") { // $.alert('这是微信浏览器') //eslint-disable-line no-undef, angular/module-getter, angular/di
+                  function onBridgeReady() {
+                    WeixinJSBridge.invoke(
+                      'getBrandWCPayRequest', {
+                        "appId": rs.appId, //公众号名称，由商户传入     
+                        "timeStamp": rs.timeStamp, //时间戳，自1970年以来的秒数     
+                        "nonceStr": rs.nonceStr, //随机串     
+                        "package": rs.packageValue,
+                        "signType": rs.signType, //微信签名方式：     
+                        "paySign": rs.paySign //微信签名 
+                      },
+                      function (res) {
+                        if (res.err_msg == "get_brand_wcpay_request:ok") {
+                          // 使用以上方式判断前端返回,微信团队郑重提示：
+                          //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                          location.href = './storeOrderDetail.html?id=' +   Id
+                        }
+                      });
+                  }
+                  onBridgeReady()
+                } else {
+                  $.alert('请使用微信浏览器进行支付')
+                }
+                // res = res.data
+                // console.log(res)
+              } else if (rs.state == NoLogin) {
+                $.alert(rs.message)
+                setTimeout(() => {
+                  // removerOpenId()
+                  // location.href = "./login.html"
+                }, 1000)
+              } else {
+                $.alert(rs.message)
+              }
+            }
+          })
+        },
+        PAYLOGIN() {
+          // let redirectUrl = window.location.href
+          // let  redirectUrl = encodeURIComponent('http://x21157b861.iok.la/ticketmobile/pay.html')
+          let redirectUrl = encodeURIComponent('http://lanmei.cqfuyuan.cn/pay.html')
+          // var code1 = sessionStorage.getItem('code')
+          if (openid != '' && openid != null && openid != undefined) {
+            // alert('openid'+JSON.stringify(openid))
+            return false
+          } else {
+            window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' +
+              'wx960808a2cf635b36' + '&redirect_uri=' + redirectUrl +
+              '&response_type=code&scope=snsapi_userinfo&state=123&connect_redirect=1#wechat_redirect'
+            var code = getParam("code")
+            // alert(JSON.stringify(code))
+            if (code != '' && code != null && code != undefined) {
+              // console.log(redirectUrl)
+              let data = {
+                code: code
+              }
+              // sessionStorage.setItem('code',code)
+              $.ajax({
+                type: 'get',
+                url: apiUrl + '/weixin/getOAuth2UserInfo',
+                // contentType: "application/json;charset=UTF-8",
+                dataType: 'json',
+                data: data,
+                async: false, // 使用同步操作
+                timeout: 50000, //超时时间：50秒
+                // xhrFields: { withCredentials: true },
+                // crossDomain: true,
+                success: function (res) {
+                  // alert(JSON.stringify(res))
+                  if (res.state == '200') {
+                    // 存取信息
+                    // alert(JSON.stringify(res.data))
+                    res = res.data
+                    sessionStorage.setItem('openid', res.providerId)
+                    // sessionStorage.setItem('profileUrl', res.profileUrl)
+                    // sessionStorage.setItem('displayName', res.displayName)
+                  } else {
+                    $.alert(res.message)
+                  }
+                },
+                error: function (error) {
+                  alert(JSON.stringify(error))
+                }
+              })
+            }
+          }
+        },
+        getShopInfo() {
+          var data = {
+            id: localId,
+            type: localType
+          }
+          Ajax({
+            type: 'post',
+            url: apiUrl + '/getIdAndType',
+            // contentType: "application/json;charset=UTF-8",
+            data: data,
             success: function (res) {
               if (res.state == _OK) {
                 res = res.data
@@ -88,9 +215,9 @@
                 // console.log(res)
               } else if (res.state == NoLogin) {
                 $.alert(res.message)
-                  setTimeout(()=> {
-                    location.href = "./login.html"
-                  },1000)
+                setTimeout(() => {
+                  location.href = "./login.html"
+                }, 1000)
               } else {
                 $.alert(res.message)
               }
@@ -112,6 +239,7 @@
     /* padding-bottom: 1.4rem; */
     padding: 0.3rem;
   }
+
   .top-bg {
     width: 100%;
     height: 0.15rem;
@@ -119,6 +247,7 @@
     border-top-right-radius: 0.2rem;
     border-top-left-radius: 0.2rem;
   }
+
   .top {
     width: 100%;
     height: 1.6rem;
@@ -130,58 +259,73 @@
     box-sizing: border-box;
     padding: 0 0.36rem;
   }
-  .top-left{
+
+  .top-left {
     width: calc(100% - 1rem);
   }
+
   .top-text {
     font-size: 0.28rem;
   }
+
   .shop-name {
     font-size: 0.24rem;
     color: #9d9d9d;
   }
+
   .top-right {
     width: 0.84rem;
     height: 0.84rem;
     margin-left: auto;
   }
-  .top-right img{
+
+  .top-right img {
     width: 100%;
     height: 100%;
   }
+
   .withdraw {
     width: 100%;
     box-sizing: border-box;
-    padding: 0.2rem 0.4rem 0 0.4rem; 
+    padding: 0.2rem 0.4rem 0 0.4rem;
     background: white;
     /* border-bottom-right-radius: 0.2rem;
     border-bottom-left-radius: 0.2rem; */
   }
+
   .withdraw-top {
     padding-top: 0.5rem;
     font-size: 0.26rem;
     color: #9d9d9d;
   }
+
   .withdraw .weui-cell {
     font-size: 0.54rem;
     padding: 10px 0px;
   }
+
   .withdraw .weui-label {
     width: 0.8rem;
   }
-  .withdraw .weui-cell:before,.weui-cells::before {
+
+  .withdraw .weui-cell:before,
+  .weui-cells::before {
     border-top: none !important;
   }
+
   .weui-cells {
     font-size: 0.32rem;
   }
+
   .weui-cell {
     height: 1rem;
   }
+
   .bank-form {
     border-bottom-right-radius: 0.2rem;
     border-bottom-left-radius: 0.2rem;
   }
+
   .bottom {
     width: 100%;
     height: 2.25rem;
@@ -192,6 +336,7 @@
     -webkit-align-items: center;
     background: white;
   }
+
   .confirm-btn {
     width: 6rem;
     height: 1rem;
@@ -204,7 +349,6 @@
     font-weight: bold;
     border-radius: 0.1rem;
   }
-  
 </style>
 
 </html>

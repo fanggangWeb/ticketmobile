@@ -16,7 +16,7 @@
   <script src="lib/jquery-3.3.1.js"></script>
   <script src="lib/swiper.4.4.2.min.js"></script>
   <script src="lib/vue.js"></script>
-  <script src="js/config.js"></script>
+  <script src="js/config1.js"></script>
   <script src="lib/jquery-weui.1.2.1.min.js"></script>
   <!-- 公用组件库结束 -->
   <script src="js/index.js"></script>
@@ -127,20 +127,26 @@
       mounted () {
         that = this
         this.getDetail()
+        sessionStorage.setItem('isDetail',1)
+        sessionStorage.setItem('scenicId',getParam('id'))
       },
       methods: {
         changeTab (item, index) {
           this.currentIndex = index
         },
         orderGo (one) {
-          sessionStorage.setItem('scenicInfo',JSON.stringify(one))
-          let mustknow = {
-            openTime: this.allInfo.openTime,
-            policy: this.allInfo.policy,
-            tips: this.allInfo.tips
-          }
-          sessionStorage.setItem('mustknow', JSON.stringify(mustknow))
-          location.href = "./ticket.html"
+          // sessionStorage.setItem('scenicInfo',JSON.stringify(one))
+          // let mustknow = {
+          //   openTime: this.allInfo.openTime,
+          //   policy: this.allInfo.policy,
+          //   tips: this.allInfo.tips
+          // }
+          // sessionStorage.setItem('mustknow', JSON.stringify(mustknow))
+          // location.href = "./ticket1.html"
+          $.alert("请完成登录后，再进行购票操作，马上将为您跳转页面")
+          setTimeout( ()=> {
+            location.href = "login.html"
+          },2000)
         },
         getDetail () {
           const data = {
@@ -165,11 +171,11 @@
                   }
                 }
               } else if (res.state == NoLogin) {
-                $.alert(res.message)
-                  setTimeout(()=> {
-                    removerOpenId()
-                    location.href = "./login.html"
-                  },1000)
+                // $.alert(res.message)
+                //   setTimeout(()=> {
+                //     removerOpenId()
+                //     location.href = "./login.html"
+                //   },1000)
               } else {
                 $.alert(res.message)
               }

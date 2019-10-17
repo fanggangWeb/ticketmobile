@@ -22,9 +22,9 @@
   <title>登录</title>
 </head>
 
-<body>
-  <div class="container">
-    <div class="welcome">欢迎登录</div>
+<body ontouchstart>
+  <div class="container" v-cloak>
+    <div class="welcome">请直接输入手机号登录</div>
     <div class="phone">
       <div class="phone-left">
         <div class="phone-text">手机号</div>
@@ -107,7 +107,11 @@
                 // alert(JSON.stringify(res))
                 res = res.data
                 localStorage.setItem('userInfo',JSON.stringify(res))
-                location.href="./index.html"
+                if (sessionStorage.getItem('isDetail')) {
+                  location.href = './scenicDetail.html?id='+sessionStorage.getItem('scenicId')
+                } else {
+                  location.href="./index.html"
+                }
               } else {
                 $.alert(res.message)
                 // alert(JSON.stringify(res.message))
@@ -159,7 +163,7 @@
     padding: 0.45rem;
   }
   .welcome {
-    font-size: 0.6rem;
+    font-size: 0.5rem;
     letter-spacing: 0.05rem;
     font-weight: bold;
     margin-top: 0.4rem;

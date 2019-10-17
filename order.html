@@ -22,8 +22,8 @@
   <title>订单</title>
 </head>
 
-<body>
-  <div class="container">
+<body ontouchstart>
+  <div class="container" v-cloak>
     <div class="shop-all">
       <div class="shop-item" :class="{'active':index==typeIndex, 'scenic-item': item.cls=='scenic-item', 'store-item': item.cls=='store-item'}" v-for="(item, index) in shopTypeList"
       :key="item.cls" @click="changeShopType(item,index)">
@@ -188,6 +188,7 @@
         },
         changeTab (item, index) {
           this.currentIndex = index
+          this.orderList = []
           this.typeVal = item.val
           this.page = 1
           if (that.typeIndex == 0) { // 门票订单
@@ -274,6 +275,7 @@
         },
         changeShopType(item,index) {
           this.typeIndex = index
+          this.orderList = []
           that.page = 1
           if (that.typeIndex == 0) { // 门票订单
             this.getScenicOrder()

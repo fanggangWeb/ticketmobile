@@ -1,7 +1,6 @@
 // let apiUrl = 'http://x21157b861.iok.la'
-// let apiUrl = 'http://39.104.98.18:8080'
-// let apiUrl = 'http://lanmei.cqfuyuan.cn/proxy'
-let apiUrl = 'http://192.168.2.94:30010'
+//let apiUrl = 'http://39.104.98.18:8080'
+let apiUrl = 'http://lanmei.cqfuyuan.cn/proxy'
 // 解析url传参
 var getParam = function (name) {
   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");

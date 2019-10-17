@@ -22,11 +22,11 @@
   <title>支付订单</title>
 </head>
 
-<body>
-  <div class="container">
+<body ontouchstart>
+  <div class="container" v-cloak>
     <div class="ticket-info">
       <div class="tab-bar">
-        <div class="tab active">重庆欢乐谷成人票</div>
+        <div class="tab active">{{allInfo.ticketName}}</div>
       </div>
       <div class="info-list">
         <div class="info-key">日期</div>

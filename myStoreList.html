@@ -23,8 +23,8 @@
   <title>首页</title>
 </head>
 
-<body>
-  <div class="container">
+<body ontouchstart>
+  <div class="container" v-cloak>
     <div class="list-container">
       <div class="list">
         <div class="weui-pull-to-refresh-layer">
@@ -47,7 +47,7 @@
               <div class="item-desc">{{one.describe| filterHtml}}</div>
               <div class="item-bottom">
                 <div class="item-tag">{{one.regionName}}|{{one.typeName}}</div>
-                <div class="item-score">{{one.score}}分</div>
+                <!-- <div class="item-score">{{one.score}}分</div> -->
               </div>
             </div>
           </div>

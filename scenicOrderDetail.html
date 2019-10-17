@@ -22,8 +22,8 @@
   <title>订单详情</title>
 </head>
 
-<body>
-  <div class="container">
+<body ontouchstart>
+  <div class="container" v-cloak>
     <div class="top">
       <div class="top-img">
         <img v-if="allInfo.file" :src="imageUrl+allInfo.file.url" alt="">
@@ -47,7 +47,7 @@
         <span class="center-text">订单号：</span>
         <span class="center-num">{{allInfo.oderNumber}}</span>
       </div>
-      <div class="warning" style="color:red;font-size: 0.28rem;">请妥善保管好二维码,勿让非工作人员扫描</div>
+      <div class="warning" style="color:red;font-size: 0.28rem;">请至兑票处出示二维码兑换纸质票入场。请妥善保管好二维码，勿让非工作人员扫描（可长按图片保存至本地）</div>
     </div>
     <div class="commodity">
       <div class="commodity-title">商品信息</div>
@@ -132,6 +132,23 @@
     //     $(".list").pullToRefreshDone(); // 重置下拉刷新
     //   }, 1500); //模拟延迟
     // });
+    jQuery(document).ready(function ($) {
+      if (window.history && window.history.pushState) {
+         $(window).on('popstate', function () {
+            var hashLocation = location.hash;
+            var hashSplit = hashLocation.split("#!/");
+            var hashName = hashSplit[1];
+            if (hashName !== '') {
+               var hash = window.location.hash;
+               if (hash === '') {
+                  location.href="./index.html"
+//                alert("Back button isn't supported. You are leaving this application on next clicking the back button");
+               }
+            }
+         });
+         window.history.pushState('forward', null, '');
+      }
+   });
   })
 </script>
 <style>
@@ -205,7 +222,7 @@
     height: 110%;
   }
   .center {
-    height: 4.5rem;
+    height: 6rem;
     background: #edeff1;
     display: flex;
     flex-wrap: wrap;
@@ -214,6 +231,8 @@
     align-items: center;
     -webkit-align-items: center;
     border-bottom: 0.02rem dotted #bdbdbd;
+    box-sizing: border-box;
+    padding: 0 0.4rem;
   }
   .qrcode {
     width: 2.6rem;

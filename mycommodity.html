@@ -22,8 +22,8 @@
   <title>我的商品</title>
 </head>
 
-<body>
-  <div class="container">
+<body ontouchstart>
+  <div class="container" v-cloak>
     <div class="shop" :class="item.cls" v-for="(item, index) in shopList" @click="go(item.url)" :key="index">
       <div class="name">{{item.name}}</div>
     </div>

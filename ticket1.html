@@ -16,7 +16,7 @@
   <script src="lib/jquery-3.3.1.js"></script>
   <script src="lib/swiper.4.4.2.min.js"></script>
   <script src="lib/vue.js"></script>
-  <script src="js/config.js"></script>
+  <script src="js/config1.js"></script>
   <script src="lib/jquery-weui.1.2.1.min.js"></script>
   <script src="lib/numeral.min.js"></script>
   <!-- 公用组件库结束 -->
@@ -25,7 +25,7 @@
 
 <body ontouchstart>
   <div class="all" v-cloak>
-    <div class="container">
+    <div class="container" >
       <div class="ticket-info">
         <div class="ticket-top">
           <div class="ticket-title">{{allInfo.name}}</div>
@@ -134,6 +134,7 @@
         that = this
         this.singlePrice = scenicInfo.price
         this.money = scenicInfo.price
+        
       },
       methods: {
         changeTab(item, index) {
@@ -175,36 +176,36 @@
             $.alert("请输入格式正确的手机号");  
             return false
           }
-          date = Date.parse(date)
-          date = timestampToTime(date)
-          const data = {
-            ticketId: that.allInfo.id,
-            name: this.contact,
-            phone: this.phoneNumber,
-            playTime: date,
-            num: this.ticketNumber,
-            spread: localStorage.getItem('spread')
-          }
-          Ajax({
-            type: 'post',
-            url: apiUrl + '/scenicSpotOder/getTickets',
-            // contentType: "application/json;charset=UTF-8",
-            data: data,
-            success: function (res) {
-              if (res.state == _OK) {
-                res = res.data
-                location.href = './scenicOrder.html?id='+res.id
-              } else if (res.state == NoLogin) {
-                $.alert(res.message)
-                setTimeout(()=> {
-                  removerOpenId()
-                  location.href = "./login.html"
-                },1000)
-              } else {
-                $.alert(res.message)
-              }
-            }
-          })
+          
+          // date = Date.parse(date)
+          // date = timestampToTime(date)
+          // const data = {
+          //   ticketId: that.allInfo.id,
+          //   name: this.contact,
+          //   phone: this.phoneNumber,
+          //   playTime: date,
+          //   num: this.ticketNumber
+          // }
+          // Ajax({
+          //   type: 'post',
+          //   url: apiUrl + '/scenicSpotOder/getTickets',
+          //   // contentType: "application/json;charset=UTF-8",
+          //   data: data,
+          //   success: function (res) {
+          //     if (res.state == _OK) {
+          //       res = res.data
+          //       location.href = './scenicOrder.html?id='+res.id
+          //     } else if (res.state == NoLogin) {
+          //       $.alert(res.message)
+          //       setTimeout(()=> {
+          //         removerOpenId()
+          //         location.href = "./login.html"
+          //       },1000)
+          //     } else {
+          //       $.alert(res.message)
+          //     }
+          //   }
+          // })
         }
       }
     })
